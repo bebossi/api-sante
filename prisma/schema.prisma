@@ -22,19 +22,6 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Decimal
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  carts       Cart[]   @relation("CartToProduct")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Category {
   id        String   @id @default(uuid())
   name      String
@@ -44,17 +31,36 @@ model Category {
   products Product[]
 }
 
+model Product {
+  id          String           @id @default(uuid())
+  name        String
+  description String
+  price       Decimal
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id])
+  carts       CartToProduct[]
+  orders      OrderToProduct[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Cart {
-  id       String    @id @default(uuid())
-  userId   String?   @unique
-  user     User?     @relation(fields: [userId], references: [id])
-  products Product[] @relation("CartToProduct")
+  id       String          @id @default(uuid())
+  userId   String?         @unique
+  user     User?           @relation(fields: [userId], references: [id])
+  products CartToProduct[]
+  subtotal Int
 }
 
 model Order {
-  id     String @id @default(uuid())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  id        String           @id @default(uuid())
+  userId    String           @unique
+  user      User             @relation(fields: [userId], references: [id])
+  productId String
+  products  OrderToProduct[]
+  subTotal  Int
+  total     Int
 }
 
 model Session {
@@ -62,4 +68,24 @@ model Session {
   sid       String   @unique
   data      String
   expiresAt DateTime
+}
+
+model CartToProduct {
+  id        String  @id @default(uuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Int
+}
+
+model OrderToProduct {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
 }

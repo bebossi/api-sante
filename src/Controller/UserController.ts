@@ -21,12 +21,6 @@ export class UserController {
         },
       });
 
-      await prisma.cart.create({
-        data: {
-          userId: newUser.id,
-        },
-      });
-
       return res.status(200).json(newUser);
     } catch (err) {
       console.log(err);
@@ -39,6 +33,9 @@ export class UserController {
 
       const user = await prisma.user.findUnique({
         where: { email: email },
+        include: {
+          cart: true,
+        },
       });
 
       if (!user) {
@@ -50,6 +47,15 @@ export class UserController {
         return res.status(401);
       }
       const token = generateToken(user);
+
+      if (!user.cart) {
+        await prisma.cart.create({
+          data: {
+            userId: user.id,
+            subtotal: 0,
+          },
+        });
+      }
 
       return res.status(200).json({
         user: {
