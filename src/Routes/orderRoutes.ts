@@ -10,5 +10,6 @@ const orderController = new OrderController();
 routes.put("/add", isAuth, authMiddleware, orderController.addProduct);
 routes.put("/remove", isAuth, authMiddleware, orderController.removeProduct);
 routes.put("/removeAll", isAuth, authMiddleware, orderController.removeAll);
+routes.post("/checkout", isAuth, authMiddleware, orderController.checkout);
 
 export default routes;

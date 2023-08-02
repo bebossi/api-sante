@@ -129,10 +129,15 @@ export class OrderController {
         return item.productId === productId;
       });
 
+      if (!existingProduct) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
       if (existingProduct && existingProduct?.quantity > 1) {
         await prisma.cartToProduct.update({
           where: {
             id: existingProduct.id,
+            cartId: cart?.id,
           },
           data: {
             quantity: existingProduct.quantity - 1,
@@ -144,6 +149,7 @@ export class OrderController {
         await prisma.cartToProduct.delete({
           where: {
             id: existingProduct?.id,
+            cartId: cart?.id,
           },
         });
       }
@@ -205,6 +211,8 @@ export class OrderController {
           },
         },
       });
+
+      return res.status(200).json(cart);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -220,11 +228,36 @@ export class OrderController {
           userId: userId,
         },
         include: {
-          products: true,
+          products: {
+            include: {
+              product: true,
+            },
+          },
         },
       });
 
-      const products = cart?.products;
+      const productsInCart = await prisma.cartToProduct.findMany({
+        where: {
+          cartId: cart?.id,
+        },
+      });
+      console.log(productsInCart);
+      const order = await prisma.order.create({
+        data: {
+          userId: userId as string,
+          subTotal: Number(cart?.subtotal),
+          total: 0,
+          products: {
+            create: productsInCart.map((cartProduct) => ({
+              productId: cartProduct.productId,
+              quantity: cartProduct.quantity,
+              price: cartProduct.price,
+            })),
+          },
+        },
+      });
+
+      return res.status(201).json(order);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);

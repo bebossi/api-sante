@@ -55,12 +55,12 @@ model Cart {
 
 model Order {
   id        String           @id @default(uuid())
-  userId    String           @unique
+  userId    String
   user      User             @relation(fields: [userId], references: [id])
-  productId String
   products  OrderToProduct[]
   subTotal  Int
   total     Int
+  createdAt DateTime         @default(now())
 }
 
 model Session {
@@ -81,11 +81,11 @@ model CartToProduct {
 }
 
 model OrderToProduct {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   quantity  Int
-  createdAt DateTime @default(now())
+  price     Int
 }
