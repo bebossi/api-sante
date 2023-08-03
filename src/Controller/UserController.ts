@@ -91,4 +91,21 @@ export class UserController {
       return res.status(500).json(err);
     }
   }
+
+  async getCurrentUser(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      return res.status(200).json(user);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+  }
 }

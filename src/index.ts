@@ -4,9 +4,11 @@ import routes from "./Routes";
 import expressSession from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
-const app = express();
-const prisma = new PrismaClient();
+import cors from "cors";
 
+const app = express();
+
+app.use(cors());
 app.use(express.json());
 app.use(
   expressSession({
@@ -17,7 +19,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
     store: new PrismaSessionStore(new PrismaClient(), {
-      checkPeriod: 2 * 60 * 1000, //ms
+      checkPeriod: 2 * 60 * 1000,
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),

@@ -11,5 +11,11 @@ routes.put("/add", isAuth, authMiddleware, orderController.addProduct);
 routes.put("/remove", isAuth, authMiddleware, orderController.removeProduct);
 routes.put("/removeAll", isAuth, authMiddleware, orderController.removeAll);
 routes.post("/checkout", isAuth, authMiddleware, orderController.checkout);
+routes.post(
+  "/test",
+  isAuth,
+  authMiddleware,
+  orderController.addProductWToppings
+);
 
 export default routes;

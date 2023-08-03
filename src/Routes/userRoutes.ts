@@ -9,5 +9,11 @@ const userController = new UserController();
 routes.post("/signup", userController.signUp);
 routes.post("/login", userController.login);
 routes.put("/update", isAuth, authMiddleware, userController.updateUser);
+routes.get(
+  "/currentUser",
+  isAuth,
+  authMiddleware,
+  userController.getCurrentUser
+);
 
 export default routes;

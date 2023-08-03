@@ -32,35 +32,57 @@ model Category {
 }
 
 model Product {
-  id          String           @id @default(uuid())
-  name        String
-  description String
-  price       Decimal
-  categoryId  String
-  category    Category         @relation(fields: [categoryId], references: [id])
-  carts       CartToProduct[]
-  orders      OrderToProduct[]
+  id            String           @id @default(uuid())
+  name          String
+  description   String
+  price         Decimal
+  image         String
+  categoryId    String
+  category      Category         @relation(fields: [categoryId], references: [id])
+  cartProducts  CartToProduct[]
+  orderProducts OrderToProduct[]
+  toppings      Topping[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model Topping {
+  id                    String                 @id @default(uuid())
+  name                  String
+  description           String
+  price                 Int
+  image                 String
+  productId             String
+  product               Product                @relation(fields: [productId], references: [id])
+  cartToProductToppings CartToProductTopping[]
+}
+
+model CartToProductTopping {
+  id            String        @id @default(uuid())
+  cartToProdId  String
+  cartToProduct CartToProduct @relation(fields: [cartToProdId], references: [id], onDelete: Cascade)
+  toppingId     String
+  topping       Topping       @relation(fields: [toppingId], references: [id])
+  quantity      Int
+}
+
 model Cart {
-  id       String          @id @default(uuid())
-  userId   String?         @unique
-  user     User?           @relation(fields: [userId], references: [id])
-  products CartToProduct[]
-  subtotal Int
+  id           String          @id @default(uuid())
+  userId       String?         @unique
+  user         User?           @relation(fields: [userId], references: [id])
+  cartProducts CartToProduct[]
+  subtotal     Int
 }
 
 model Order {
-  id        String           @id @default(uuid())
-  userId    String
-  user      User             @relation(fields: [userId], references: [id])
-  products  OrderToProduct[]
-  subTotal  Int
-  total     Int
-  createdAt DateTime         @default(now())
+  id            String           @id @default(uuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  orderProducts OrderToProduct[]
+  subTotal      Int
+  total         Int
+  createdAt     DateTime         @default(now())
 }
 
 model Session {
@@ -71,13 +93,14 @@ model Session {
 }
 
 model CartToProduct {
-  id        String  @id @default(uuid())
-  cartId    String
-  cart      Cart    @relation(fields: [cartId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Int
+  id                    String                 @id @default(uuid())
+  cartId                String
+  cart                  Cart                   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId             String
+  product               Product                @relation(fields: [productId], references: [id])
+  quantity              Int
+  price                 Int
+  cartToProductToppings CartToProductTopping[]
 }
 
 model OrderToProduct {
