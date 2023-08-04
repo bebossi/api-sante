@@ -17,5 +17,11 @@ routes.post(
   authMiddleware,
   orderController.addProductWToppings
 );
+routes.post(
+  "/testCheckout",
+  isAuth,
+  authMiddleware,
+  orderController.testingOrder
+);
 
 export default routes;

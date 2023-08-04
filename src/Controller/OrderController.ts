@@ -1,4 +1,9 @@
-import { Topping, CartToProduct, PrismaClient } from "@prisma/client";
+import {
+  Topping,
+  CartToProduct,
+  PrismaClient,
+  OrderToProductTopping,
+} from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -442,6 +447,7 @@ export class OrderController {
           cartProducts: {
             include: {
               product: true,
+              cartToProductToppings: true,
             },
           },
         },
@@ -450,6 +456,9 @@ export class OrderController {
       const productsInCart = await prisma.cartToProduct.findMany({
         where: {
           cartId: cart?.id,
+        },
+        include: {
+          cartToProductToppings: true,
         },
       });
 
@@ -469,6 +478,64 @@ export class OrderController {
       });
 
       return res.status(201).json(order);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async testingOrder(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+
+      const cart = await prisma.cart.findUnique({
+        where: {
+          userId: userId,
+        },
+        include: {
+          cartProducts: {
+            include: {
+              product: true,
+              cartToProductToppings: true,
+            },
+          },
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          userId: userId as string,
+          subTotal: Number(cart?.subtotal),
+          total: 0,
+        },
+      });
+
+      for (const cartProduct of cart?.cartProducts || []) {
+        const toppings = cartProduct.cartToProductToppings.map((topping) => ({
+          toppingId: topping.toppingId,
+          quantity: topping.quantity,
+        }));
+
+        const orderProduct = await prisma.orderToProduct.create({
+          data: {
+            orderId: order.id,
+            productId: cartProduct.productId,
+            quantity: cartProduct.quantity,
+            price: cartProduct.price,
+            orderToProductTopping: {
+              create: toppings,
+            },
+          },
+        });
+      }
+
+      const actualOrder = await prisma.order.findUnique({
+        where: {
+          id: order.id,
+        },
+      });
+
+      return res.status(201).json(actualOrder);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
