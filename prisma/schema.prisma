@@ -48,14 +48,15 @@ model Product {
 }
 
 model Topping {
-  id                    String                 @id @default(uuid())
-  name                  String
-  description           String
-  price                 Int
-  image                 String
-  productId             String
-  product               Product                @relation(fields: [productId], references: [id])
-  cartToProductToppings CartToProductTopping[]
+  id                     String                  @id @default(uuid())
+  name                   String
+  description            String
+  price                  Int
+  image                  String
+  productId              String
+  product                Product                 @relation(fields: [productId], references: [id])
+  cartToProductToppings  CartToProductTopping[]
+  orderToProductToppings OrderToProductTopping[]
 }
 
 model CartToProductTopping {
@@ -65,6 +66,15 @@ model CartToProductTopping {
   toppingId     String
   topping       Topping       @relation(fields: [toppingId], references: [id])
   quantity      Int
+}
+
+model OrderToProductTopping {
+  id               String         @id @default(uuid())
+  orderToProductId String
+  orderToProduct   OrderToProduct @relation(fields: [orderToProductId], references: [id], onDelete: Cascade)
+  toppingId        String
+  topping          Topping        @relation(fields: [toppingId], references: [id])
+  quantity         Int
 }
 
 model Cart {
@@ -104,11 +114,12 @@ model CartToProduct {
 }
 
 model OrderToProduct {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Int
+  id                    String                  @id @default(uuid())
+  orderId               String
+  order                 Order                   @relation(fields: [orderId], references: [id])
+  productId             String
+  product               Product                 @relation(fields: [productId], references: [id])
+  quantity              Int
+  price                 Int
+  orderToProductTopping OrderToProductTopping[]
 }

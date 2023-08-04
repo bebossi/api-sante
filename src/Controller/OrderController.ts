@@ -161,115 +161,115 @@ export class OrderController {
     }
   }
 
-  async addProduct(req: Request, res: Response) {
-    try {
-      const { productId } = req.body;
-      const userId = req.currentUser?.id as string;
+  // async addProduct(req: Request, res: Response) {
+  //   try {
+  //     const { productId } = req.body;
+  //     const userId = req.currentUser?.id as string;
 
-      const addProduct = await prisma.product.findUnique({
-        where: {
-          id: productId,
-        },
-        include: {
-          toppings: {
-            include: {
-              cartToProductToppings: true,
-            },
-          },
-        },
-      });
+  //     const addProduct = await prisma.product.findUnique({
+  //       where: {
+  //         id: productId,
+  //       },
+  //       include: {
+  //         toppings: {
+  //           include: {
+  //             cartToProductToppings: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      if (!addProduct) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-      const toppings = addProduct.toppings;
+  //     if (!addProduct) {
+  //       return res.status(404).json({ error: "Product not found" });
+  //     }
+  //     const toppings = addProduct.toppings;
 
-      let toppingPrice = 0;
-      for (const topping of toppings) {
-        const selectedTopping = toppings.find((item) => {
-          item.id;
-        });
-      }
+  //     let toppingPrice = 0;
+  //     for (const topping of toppings) {
+  //       const selectedTopping = toppings.find((item) => {
+  //         item.id;
+  //       });
+  //     }
 
-      const cart = await prisma.cart.findUnique({
-        where: {
-          userId,
-        },
-        include: {
-          cartProducts: true,
-        },
-      });
+  //     const cart = await prisma.cart.findUnique({
+  //       where: {
+  //         userId,
+  //       },
+  //       include: {
+  //         cartProducts: true,
+  //       },
+  //     });
 
-      let existingProduct: CartToProduct | undefined;
+  //     let existingProduct: CartToProduct | undefined;
 
-      existingProduct = cart?.cartProducts.find((item) => {
-        return item.productId === productId;
-      });
+  //     existingProduct = cart?.cartProducts.find((item) => {
+  //       return item.productId === productId;
+  //     });
 
-      if (existingProduct) {
-        await prisma.cartToProduct.update({
-          where: {
-            id: existingProduct.id,
-          },
-          data: {
-            quantity: existingProduct.quantity + 1,
-            price: Number(addProduct.price) * (existingProduct.quantity + 1),
-          },
-        });
-      } else {
-        existingProduct = await prisma.cartToProduct.create({
-          data: {
-            cartId: cart?.id as string,
-            productId: productId,
-            quantity: 1,
-            price: Number(addProduct.price),
-          },
-        });
-      }
+  //     if (existingProduct) {
+  //       await prisma.cartToProduct.update({
+  //         where: {
+  //           id: existingProduct.id,
+  //         },
+  //         data: {
+  //           quantity: existingProduct.quantity + 1,
+  //           price: Number(addProduct.price) * (existingProduct.quantity + 1),
+  //         },
+  //       });
+  //     } else {
+  //       existingProduct = await prisma.cartToProduct.create({
+  //         data: {
+  //           cartId: cart?.id as string,
+  //           productId: productId,
+  //           quantity: 1,
+  //           price: Number(addProduct.price),
+  //         },
+  //       });
+  //     }
 
-      const cartWithNewProduct = await prisma.cart.findUnique({
-        where: {
-          id: cart?.id,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              product: true,
-            },
-          },
-        },
-      });
+  //     const cartWithNewProduct = await prisma.cart.findUnique({
+  //       where: {
+  //         id: cart?.id,
+  //       },
+  //       include: {
+  //         cartProducts: {
+  //           include: {
+  //             product: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      const subtotal = cartWithNewProduct?.cartProducts.reduce(
-        (total, cartProduct) => {
-          return total + Number(cartProduct.price);
-        },
-        0
-      );
+  //     const subtotal = cartWithNewProduct?.cartProducts.reduce(
+  //       (total, cartProduct) => {
+  //         return total + Number(cartProduct.price);
+  //       },
+  //       0
+  //     );
 
-      const updatedCart = await prisma.cart.update({
-        where: {
-          id: cart?.id,
-        },
-        data: {
-          cartProducts: {
-            connect: {
-              id: existingProduct.id,
-            },
-          },
-          subtotal: subtotal,
-        },
-        include: {
-          cartProducts: true,
-        },
-      });
+  //     const updatedCart = await prisma.cart.update({
+  //       where: {
+  //         id: cart?.id,
+  //       },
+  //       data: {
+  //         cartProducts: {
+  //           connect: {
+  //             id: existingProduct.id,
+  //           },
+  //         },
+  //         subtotal: subtotal,
+  //       },
+  //       include: {
+  //         cartProducts: true,
+  //       },
+  //     });
 
-      return res.status(200).json(updatedCart);
-    } catch (err) {
-      console.log(err);
-      return res.status(400).json(err);
-    }
-  }
+  //     return res.status(200).json(updatedCart);
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res.status(400).json(err);
+  //   }
+  // }
 
   async removeProduct(req: Request, res: Response) {
     try {
@@ -341,9 +341,6 @@ export class OrderController {
             }
           }
         }
-        console.log("existingProdictPrice", existingProduct.price);
-        console.log("Removed product Price", removedProduct.price);
-        console.log("toppings price", toppingsPrice);
 
         await prisma.cartToProduct.update({
           where: {
@@ -398,6 +395,7 @@ export class OrderController {
           cartProducts: {
             include: {
               product: true,
+              cartToProductToppings: true,
             },
           },
         },
