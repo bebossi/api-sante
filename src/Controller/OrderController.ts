@@ -57,13 +57,13 @@ export class OrderController {
       if (existingProduct) {
         for (const topping of toppings) {
           const selectedTopping = addProduct.toppings.find((item) => {
-            return item.id === topping.id;
+            return item.id === topping.topping.id;
           });
           if (selectedTopping) {
             await prisma.cartToProductTopping.create({
               data: {
                 cartToProdId: existingProduct.id,
-                toppingId: String(topping.id),
+                toppingId: String(topping.topping.id),
                 quantity: topping.quantity,
               },
             });
@@ -93,7 +93,7 @@ export class OrderController {
 
         for (const topping of toppings) {
           const selectedTopping = addProduct.toppings.find(
-            (item) => item.id === topping.id
+            (item) => item.id === topping.topping.id
           );
 
           if (selectedTopping) {

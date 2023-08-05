@@ -62,4 +62,19 @@ export class ProductController {
       return res.status(400).json(err);
     }
   }
+
+  async getProducts(req: Request, res: Response) {
+    try {
+      const products = await prisma.product.findMany({
+        include: {
+          toppings: true,
+        },
+      });
+
+      return res.status(200).json(products);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 }
