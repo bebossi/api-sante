@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(
   expressSession({
     cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // ms
+      maxAge: 60 * 60 * 1000, // ms
     },
     secret: process.env.TOKEN_SIGN_SECRET!,
     resave: true,

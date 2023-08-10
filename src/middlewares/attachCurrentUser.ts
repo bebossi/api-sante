@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 declare module "express" {
   interface Request {
-    currentUser?: User;
+    currentUser?: User | { id: string };
   }
 }
 
@@ -18,17 +18,20 @@ export async function authMiddleware(
   try {
     const { authorization } = req.headers;
 
-    if (!authorization) {
-      return res.sendStatus(403);
+    // if (!authorization) {
+    //   return res.sendStatus(403);
+    // }
+    if (authorization) {
+      const token = authorization.replace("Bearer", "").trim();
+      const secret = process.env.TOKEN_SIGN_SECRET as string;
+
+      const data = jwt.verify(token, secret) as User;
+      const user = await prisma.user.findUnique({ where: { id: data.id } });
+
+      req.currentUser = user as User;
+    } else {
+      req.currentUser = { id: req.sessionID };
     }
-
-    const token = authorization.replace("Bearer", "").trim();
-    const secret = process.env.TOKEN_SIGN_SECRET as string;
-
-    const data = jwt.verify(token, secret) as User;
-    const user = await prisma.user.findUnique({ where: { id: data.id } });
-
-    req.currentUser = user as User;
 
     next();
   } catch (error) {

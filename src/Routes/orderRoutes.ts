@@ -9,19 +9,27 @@ const orderController = new OrderController();
 
 // routes.put("/add", isAuth, authMiddleware, orderController.addProduct);
 routes.put("/remove", isAuth, authMiddleware, orderController.removeProduct);
-routes.put("/removeAll", isAuth, authMiddleware, orderController.removeAll);
-routes.post("/checkout", isAuth, authMiddleware, orderController.checkout);
-routes.post(
-  "/test",
+routes.delete(
+  "/remove",
   isAuth,
   authMiddleware,
-  orderController.addProductWToppings
+  orderController.removeProductt
 );
+routes.put("/removeAll", authMiddleware, orderController.removeAll);
+routes.post("/checkout", authMiddleware, orderController.checkout);
+routes.post(
+  "/increaseQuantityProd",
+
+  authMiddleware,
+  orderController.putQuantity
+);
+routes.post("/addProduct", authMiddleware, orderController.addProduct);
 routes.post(
   "/testCheckout",
-  isAuth,
+
   authMiddleware,
   orderController.testingOrder
 );
+routes.get("/cart", authMiddleware, orderController.getCart);
 
 export default routes;

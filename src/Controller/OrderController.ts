@@ -9,7 +9,131 @@ import { Request, Response } from "express";
 const prisma = new PrismaClient();
 
 export class OrderController {
-  async addProductWToppings(req: Request, res: Response) {
+  async addProduct(req: Request, res: Response) {
+    try {
+      const { productId, toppings, quantity } = req.body;
+
+      let userId = req.currentUser?.id;
+      console.log(userId);
+
+      const cart = await prisma.cart.findUnique({
+        where: {
+          userId: userId,
+        },
+        include: {
+          cartProducts: {
+            include: {
+              product: true,
+              cartToProductToppings: true,
+            },
+          },
+        },
+      });
+
+      const addProduct = await prisma.product.findUnique({
+        where: {
+          id: productId,
+        },
+        include: {
+          toppings: {
+            include: {
+              cartToProductToppings: true,
+            },
+          },
+        },
+      });
+
+      if (!addProduct) {
+        return res.status(404).json("Product is required");
+      }
+
+      const cartToProduct = await prisma.cartToProduct.create({
+        data: {
+          cartId: cart?.id as string,
+          productId: productId,
+          quantity: quantity,
+          price: Number(addProduct?.price),
+        },
+      });
+
+      let toppingsPrice = 0;
+
+      for (const topping of toppings) {
+        const selectedTopping = addProduct.toppings.find(
+          (item) => item.id === topping.topping.id
+        );
+
+        if (selectedTopping) {
+          await prisma.cartToProductTopping.create({
+            data: {
+              toppingId: selectedTopping.id,
+              cartToProdId: cartToProduct.id,
+              quantity: Number(topping.quantity) * cartToProduct.quantity,
+            },
+          });
+          toppingsPrice +=
+            selectedTopping.price *
+            Number(topping.quantity) *
+            cartToProduct.quantity;
+        }
+      }
+
+      await prisma.cartToProduct.update({
+        where: {
+          id: cartToProduct.id,
+        },
+        data: {
+          price: Number(addProduct.price) * quantity + Number(toppingsPrice),
+        },
+      });
+      const cartWithNewProduct = await prisma.cart.findUnique({
+        where: {
+          id: cart?.id,
+        },
+        include: {
+          cartProducts: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      });
+
+      const subtotal = cartWithNewProduct?.cartProducts.reduce(
+        (total, cartProduct) => {
+          return total + Number(cartProduct.price);
+        },
+        0
+      );
+
+      const updatedCart = await prisma.cart.update({
+        where: {
+          id: cart?.id,
+        },
+        data: {
+          cartProducts: {
+            connect: {
+              id: cartToProduct.id,
+            },
+          },
+          subtotal: subtotal,
+        },
+        include: {
+          cartProducts: {
+            include: {
+              cartToProductToppings: true,
+            },
+          },
+        },
+      });
+      return res.status(200).json(updatedCart);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async putQuantity(req: Request, res: Response) {
     try {
       const { productId, toppings, quantity } = req.body;
 
@@ -166,115 +290,59 @@ export class OrderController {
     }
   }
 
-  // async addProduct(req: Request, res: Response) {
-  //   try {
-  //     const { productId } = req.body;
-  //     const userId = req.currentUser?.id as string;
+  async removeProductt(req: Request, res: Response) {
+    try {
+      const { productId, cartProductId } = req.body;
+      const userId = req.currentUser?.id as string;
 
-  //     const addProduct = await prisma.product.findUnique({
-  //       where: {
-  //         id: productId,
-  //       },
-  //       include: {
-  //         toppings: {
-  //           include: {
-  //             cartToProductToppings: true,
-  //           },
-  //         },
-  //       },
-  //     });
+      const removedProduct = await prisma.product.findUnique({
+        where: {
+          id: productId,
+        },
+        include: {
+          toppings: {
+            include: {
+              cartToProductToppings: true,
+            },
+          },
+        },
+      });
 
-  //     if (!addProduct) {
-  //       return res.status(404).json({ error: "Product not found" });
-  //     }
-  //     const toppings = addProduct.toppings;
+      if (!removedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
 
-  //     let toppingPrice = 0;
-  //     for (const topping of toppings) {
-  //       const selectedTopping = toppings.find((item) => {
-  //         item.id;
-  //       });
-  //     }
+      const cart = await prisma.cart.findUnique({
+        where: {
+          userId: userId,
+        },
+        include: {
+          cartProducts: true,
+        },
+      });
 
-  //     const cart = await prisma.cart.findUnique({
-  //       where: {
-  //         userId,
-  //       },
-  //       include: {
-  //         cartProducts: true,
-  //       },
-  //     });
+      const cartToProduct = await prisma.cartToProduct.delete({
+        where: {
+          cartId: cart?.id,
+          id: cartProductId,
+        },
+      });
 
-  //     let existingProduct: CartToProduct | undefined;
+      const updatedCart = await prisma.cart.update({
+        where: {
+          userId: userId,
+        },
+        data: {
+          subtotal: Number(cart?.subtotal) - cartToProduct.price,
+        },
+      });
 
-  //     existingProduct = cart?.cartProducts.find((item) => {
-  //       return item.productId === productId;
-  //     });
-
-  //     if (existingProduct) {
-  //       await prisma.cartToProduct.update({
-  //         where: {
-  //           id: existingProduct.id,
-  //         },
-  //         data: {
-  //           quantity: existingProduct.quantity + 1,
-  //           price: Number(addProduct.price) * (existingProduct.quantity + 1),
-  //         },
-  //       });
-  //     } else {
-  //       existingProduct = await prisma.cartToProduct.create({
-  //         data: {
-  //           cartId: cart?.id as string,
-  //           productId: productId,
-  //           quantity: 1,
-  //           price: Number(addProduct.price),
-  //         },
-  //       });
-  //     }
-
-  //     const cartWithNewProduct = await prisma.cart.findUnique({
-  //       where: {
-  //         id: cart?.id,
-  //       },
-  //       include: {
-  //         cartProducts: {
-  //           include: {
-  //             product: true,
-  //           },
-  //         },
-  //       },
-  //     });
-
-  //     const subtotal = cartWithNewProduct?.cartProducts.reduce(
-  //       (total, cartProduct) => {
-  //         return total + Number(cartProduct.price);
-  //       },
-  //       0
-  //     );
-
-  //     const updatedCart = await prisma.cart.update({
-  //       where: {
-  //         id: cart?.id,
-  //       },
-  //       data: {
-  //         cartProducts: {
-  //           connect: {
-  //             id: existingProduct.id,
-  //           },
-  //         },
-  //         subtotal: subtotal,
-  //       },
-  //       include: {
-  //         cartProducts: true,
-  //       },
-  //     });
-
-  //     return res.status(200).json(updatedCart);
-  //   } catch (err) {
-  //     console.log(err);
-  //     return res.status(400).json(err);
-  //   }
-  // }
+      return res.status(200).json(updatedCart);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 
   async removeProduct(req: Request, res: Response) {
     try {
@@ -536,6 +604,34 @@ export class OrderController {
       });
 
       return res.status(201).json(actualOrder);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async getCart(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+      const cart = await prisma.cart.findUnique({
+        where: {
+          userId: userId,
+        },
+        include: {
+          cartProducts: {
+            include: {
+              product: true,
+              cartToProductToppings: {
+                include: {
+                  topping: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return res.status(200).json(cart);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);

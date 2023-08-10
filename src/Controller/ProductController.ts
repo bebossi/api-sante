@@ -77,4 +77,14 @@ export class ProductController {
       return res.status(400).json(err);
     }
   }
+
+  async getCategories(req: Request, res: Response) {
+    try {
+      const categories = await prisma.category.findMany();
+      return res.status(200).json(categories);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 }
