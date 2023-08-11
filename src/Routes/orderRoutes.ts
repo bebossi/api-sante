@@ -31,5 +31,6 @@ routes.post(
   orderController.testingOrder
 );
 routes.get("/cart", authMiddleware, orderController.getCart);
+routes.get("/get", orderController.deletingAll);
 
 export default routes;

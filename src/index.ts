@@ -8,16 +8,14 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
 app.use(
   expressSession({
     cookie: {
-      maxAge: 60 * 60 * 1000, // ms
+      maxAge: 60 * 60 * 1000,
     },
     secret: process.env.TOKEN_SIGN_SECRET!,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     store: new PrismaSessionStore(new PrismaClient(), {
       checkPeriod: 2 * 60 * 1000,
       dbRecordIdIsSessionId: true,
@@ -25,6 +23,8 @@ app.use(
     }),
   })
 );
+app.use(cors());
+app.use(express.json());
 app.use(routes);
 
 app.listen(process.env.PORT_EXPRESS, () => {

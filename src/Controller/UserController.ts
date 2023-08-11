@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { generateToken } from "../config/jwt.config";
+import auth0Client from "../config/auth0.config";
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,29 @@ export class UserController {
       });
 
       return res.status(200).json(newUser);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async guestUser(req: Request, res: Response) {
+    try {
+      const guestUser = await prisma.user.create({
+        data: {
+          role: "guest",
+        },
+      });
+
+      const token = generateToken(guestUser);
+
+      const guestCart = await prisma.cart.create({
+        data: {
+          userId: guestUser.id,
+          subtotal: 0,
+        },
+      });
+
+      return res.status(200).json({ guestUser, token });
     } catch (err) {
       console.log(err);
     }
@@ -56,6 +80,11 @@ export class UserController {
           },
         });
       }
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
 
       return res.status(200).json({
         user: {

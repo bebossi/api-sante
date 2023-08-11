@@ -1,9 +1,4 @@
-import {
-  Topping,
-  CartToProduct,
-  PrismaClient,
-  OrderToProductTopping,
-} from "@prisma/client";
+import { CartToProduct, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -13,8 +8,8 @@ export class OrderController {
     try {
       const { productId, toppings, quantity } = req.body;
 
-      let userId = req.currentUser?.id;
-      console.log(userId);
+      console.log("current user", req.currentUser?.id);
+      const userId = req.currentUser?.id;
 
       const cart = await prisma.cart.findUnique({
         where: {
@@ -611,8 +606,9 @@ export class OrderController {
   }
 
   async getCart(req: Request, res: Response) {
+    const userId = req.currentUser?.id;
+
     try {
-      const userId = req.currentUser?.id;
       const cart = await prisma.cart.findUnique({
         where: {
           userId: userId,
@@ -631,10 +627,40 @@ export class OrderController {
         },
       });
 
+      if (!cart) {
+        await prisma.cart.create({
+          data: {
+            userId: userId,
+            subtotal: 0,
+          },
+          include: {
+            cartProducts: {
+              include: {
+                product: true,
+                cartToProductToppings: {
+                  include: {
+                    topping: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
       return res.status(200).json(cart);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
+    }
+  }
+
+  async deletingAll(req: Request, res: Response) {
+    try {
+      await prisma.cart.deleteMany();
+      return res.status(204).json("good");
+    } catch (err) {
+      console.log(err);
     }
   }
 }

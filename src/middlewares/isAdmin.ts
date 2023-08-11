@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 declare module "express" {
   interface Request {
-    currentUser?: User | { id: string };
+    currentUser?: User;
   }
 }
 
