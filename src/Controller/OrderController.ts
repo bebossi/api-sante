@@ -7,8 +7,6 @@ export class OrderController {
   async addProduct(req: Request, res: Response) {
     try {
       const { productId, toppings, quantity } = req.body;
-
-      console.log("current user", req.currentUser?.id);
       const userId = req.currentUser?.id;
 
       const cart = await prisma.cart.findUnique({
