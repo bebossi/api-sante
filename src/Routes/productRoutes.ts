@@ -12,5 +12,7 @@ routes.post("/category", isAuth, isAdmin, productController.createCategory);
 routes.post("/createTopping", isAuth, isAdmin, productController.createTopping);
 routes.get("/getProducts", productController.getProducts);
 routes.get("/getCategories", productController.getCategories);
+routes.delete("/delete", productController.deleteProduct);
+routes.get("/getProduct/:productId", productController.getProduct);
 
 export default routes;

@@ -68,6 +68,9 @@ export class ProductController {
       const products = await prisma.product.findMany({
         include: {
           toppings: true,
+          category: true,
+          cartProducts: true,
+          orderProducts: true,
         },
       });
 
@@ -82,6 +85,43 @@ export class ProductController {
     try {
       const categories = await prisma.category.findMany();
       return res.status(200).json(categories);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async deleteProduct(req: Request, res: Response) {
+    try {
+      const { productId } = req.body;
+
+      const product = await prisma.product.delete({
+        where: {
+          id: productId,
+        },
+      });
+
+      return res.status(200).json(product);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async getProduct(req: Request, res: Response) {
+    try {
+      const { productId } = req.params;
+
+      const product = await prisma.product.findUnique({
+        where: {
+          id: productId,
+        },
+        include: {
+          toppings: true,
+        },
+      });
+
+      return res.status(200).json(product);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
