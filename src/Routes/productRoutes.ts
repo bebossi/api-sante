@@ -13,7 +13,8 @@ routes.get("/getProduct/:productId", productController.getProduct);
 routes.put("/updateProduct/:productId", productController.updateProduct);
 routes.delete("/delete", productController.deleteProduct);
 routes.get("/getCategories", productController.getCategories);
-routes.post("/category", isAuth, isAdmin, productController.createCategory);
-routes.post("/createTopping", isAuth, isAdmin, productController.createTopping);
+routes.post("/category", productController.createCategory);
+routes.post("/createTopping", productController.createTopping);
+routes.get("/getToppings", productController.getToppings);
 
 export default routes;

@@ -153,4 +153,19 @@ export class ProductController {
       return res.status(400).json(err);
     }
   }
+
+  async getToppings(req: Request, res: Response) {
+    try {
+      const toppings = await prisma.topping.findMany({
+        include: {
+          product: true,
+        },
+      });
+
+      return res.status(200).json(toppings);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 }
