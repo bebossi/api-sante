@@ -127,4 +127,30 @@ export class ProductController {
       return res.status(400).json(err);
     }
   }
+
+  async updateProduct(req: Request, res: Response) {
+    try {
+      const { productId } = req.body;
+
+      const { name, image, description, price, categoryId } = req.body;
+
+      const updatedProduct = await prisma.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          name: name,
+          description: description,
+          image: image,
+          price: price,
+          categoryId: categoryId,
+        },
+      });
+
+      return res.status(200).json(updatedProduct);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 }
