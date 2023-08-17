@@ -10,7 +10,7 @@ const orderController = new OrderController();
 // routes.put("/add", isAuth, authMiddleware, orderController.addProduct);
 routes.put("/remove", isAuth, authMiddleware, orderController.removeProduct);
 routes.delete(
-  "/remove",
+  "/removeProduct",
   isAuth,
   authMiddleware,
   orderController.removeProductt

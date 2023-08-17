@@ -318,12 +318,14 @@ export class OrderController {
         where: {
           cartId: cart?.id,
           id: cartProductId,
+          productId: productId,
         },
       });
 
       const updatedCart = await prisma.cart.update({
         where: {
           userId: userId,
+          id: cart?.id,
         },
         data: {
           subtotal: Number(cart?.subtotal) - cartToProduct.price,

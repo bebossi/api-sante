@@ -14,7 +14,9 @@ routes.put("/updateProduct/:productId", productController.updateProduct);
 routes.delete("/delete", productController.deleteProduct);
 routes.get("/getCategories", productController.getCategories);
 routes.post("/category", productController.createCategory);
+routes.get("/getCategory/:categoryId", productController.getCategory);
 routes.post("/createTopping", productController.createTopping);
 routes.get("/getToppings", productController.getToppings);
+routes.get("/getTopping/:toppingId", productController.getTopping);
 
 export default routes;

@@ -168,4 +168,41 @@ export class ProductController {
       return res.status(400).json(err);
     }
   }
+
+  async getTopping(req: Request, res: Response) {
+    try {
+      const { toppingId } = req.params;
+
+      const topping = await prisma.topping.findUnique({
+        where: {
+          id: toppingId,
+        },
+        include: {
+          product: true,
+        },
+      });
+
+      return res.status(200).json(topping);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async getCategory(req: Request, res: Response) {
+    try {
+      const { categoryId } = req.params;
+
+      const category = await prisma.category.findUnique({
+        where: {
+          id: categoryId,
+        },
+      });
+
+      return res.status(200).json(category);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 }
