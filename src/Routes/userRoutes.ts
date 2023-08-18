@@ -16,5 +16,6 @@ routes.get(
   userController.getCurrentUser
 );
 routes.post("/guestUser", userController.guestUser);
+routes.post("/address", isAuth, authMiddleware, userController.createAddress);
 
 export default routes;

@@ -137,4 +137,28 @@ export class UserController {
       return res.status(500).json(err);
     }
   }
+
+  async createAddress(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+      const { street, neighborhood, streetNumber, complementNumber, CEP } =
+        req.body;
+
+      const address = await prisma.address.create({
+        data: {
+          userId: userId as string,
+          street: street,
+          neighborhood: neighborhood,
+          streetNumber: Number(streetNumber),
+          complementNumber: Number(complementNumber),
+          CEP: Number(CEP),
+        },
+      });
+
+      return res.status(200).json(address);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+  }
 }
