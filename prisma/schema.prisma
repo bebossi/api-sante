@@ -24,14 +24,15 @@ model User {
 }
 
 model Address {
-  id               String @id @default(uuid())
+  id               String  @id @default(uuid())
   street           String
   neighborhood     String
   streetNumber     Int
   complementNumber Int?
   CEP              Int
   userId           String
-  user             User   @relation(fields: [userId], references: [id])
+  user             User    @relation(fields: [userId], references: [id])
+  order            Order[]
 }
 
 model Category {
@@ -98,8 +99,10 @@ model Order {
   subTotal      Int
   total         Int
   createdAt     DateTime         @default(now())
+  addressId     String
 
-  user User @relation(fields: [userId], references: [id])
+  address Address @relation(fields: [addressId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 }
 
 model Cart {

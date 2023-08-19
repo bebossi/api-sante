@@ -501,6 +501,7 @@ export class OrderController {
   async checkout(req: Request, res: Response) {
     try {
       const userId = req.currentUser?.id;
+      const { addressId } = req.body;
 
       const cart = await prisma.cart.findUnique({
         where: {
@@ -527,6 +528,7 @@ export class OrderController {
 
       const order = await prisma.order.create({
         data: {
+          addressId: addressId,
           userId: userId as string,
           subTotal: Number(cart?.subtotal),
           total: 0,
@@ -550,6 +552,7 @@ export class OrderController {
   async testingOrder(req: Request, res: Response) {
     try {
       const userId = req.currentUser?.id;
+      const { addressId } = req.body;
 
       const cart = await prisma.cart.findUnique({
         where: {
@@ -567,6 +570,7 @@ export class OrderController {
 
       const order = await prisma.order.create({
         data: {
+          addressId: addressId,
           userId: userId as string,
           subTotal: Number(cart?.subtotal),
           total: 0,
