@@ -602,6 +602,21 @@ export class OrderController {
         },
       });
 
+      await prisma.cart.update({
+        where: {
+          id: cart?.id,
+        },
+        data: {
+          subtotal: 0,
+        },
+      });
+
+      await prisma.cartToProduct.deleteMany({
+        where: {
+          cartId: cart?.id,
+        },
+      });
+
       return res.status(201).json(actualOrder);
     } catch (err) {
       console.log(err);
@@ -665,6 +680,60 @@ export class OrderController {
       return res.status(204).json("good");
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  async getOrders(req: Request, res: Response) {
+    try {
+      const orders = await prisma.order.findMany({
+        include: {
+          address: true,
+          orderProducts: true,
+          user: true,
+        },
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
+      });
+
+      return res.status(200).json(orders);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async getOrder(req: Request, res: Response) {
+    try {
+      const { orderId } = req.params;
+
+      const order = await prisma.order.findUnique({
+        where: {
+          id: orderId,
+        },
+        include: {
+          address: true,
+          orderProducts: {
+            include: {
+              product: true,
+              orderToProductTopping: {
+                include: {
+                  topping: true,
+                  orderToProduct: true,
+                },
+              },
+            },
+          },
+          user: true,
+        },
+      });
+
+      return res.status(200).json(order);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
     }
   }
 }

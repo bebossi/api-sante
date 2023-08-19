@@ -32,5 +32,7 @@ routes.post(
 );
 routes.get("/cart", authMiddleware, orderController.getCart);
 routes.get("/get", orderController.deletingAll);
+routes.get("/getOrders", orderController.getOrders);
+routes.get("/getOrder/:orderId", orderController.getOrder);
 
 export default routes;
