@@ -129,6 +129,11 @@ export class UserController {
         where: {
           id: userId,
         },
+        include: {
+          cart: true,
+          addresses: true,
+          orders: true,
+        },
       });
 
       return res.status(200).json(user);

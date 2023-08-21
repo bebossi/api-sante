@@ -573,7 +573,7 @@ export class OrderController {
             product_data: {
               name: orderProduct.product.name,
             },
-            unit_amount: orderProduct.price * 100,
+            unit_amount: (orderProduct.price * 100) / orderProduct.quantity,
           },
         });
       });
