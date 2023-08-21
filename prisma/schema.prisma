@@ -100,8 +100,9 @@ model Order {
   total         Int
   createdAt     DateTime         @default(now())
   addressId     String
+  isPaid        Boolean          @default(false)
 
-  address Address @relation(fields: [addressId], references: [id])
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id])
 }
 
@@ -145,5 +146,5 @@ model OrderToProduct {
   orderToProductTopping OrderToProductTopping[]
 
   product Product @relation(fields: [productId], references: [id])
-  order   Order   @relation(fields: [orderId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }

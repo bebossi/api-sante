@@ -1,5 +1,8 @@
 import { CartToProduct, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import Stripe from "stripe";
+import { stripe } from "../libs/stripe";
+import bodyParser from "body-parser";
 
 const prisma = new PrismaClient();
 
@@ -498,57 +501,6 @@ export class OrderController {
     }
   }
 
-  async checkout(req: Request, res: Response) {
-    try {
-      const userId = req.currentUser?.id;
-      const { addressId } = req.body;
-
-      const cart = await prisma.cart.findUnique({
-        where: {
-          userId: userId,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              product: true,
-              cartToProductToppings: true,
-            },
-          },
-        },
-      });
-
-      const productsInCart = await prisma.cartToProduct.findMany({
-        where: {
-          cartId: cart?.id,
-        },
-        include: {
-          cartToProductToppings: true,
-        },
-      });
-
-      const order = await prisma.order.create({
-        data: {
-          addressId: addressId,
-          userId: userId as string,
-          subTotal: Number(cart?.subtotal),
-          total: 0,
-          orderProducts: {
-            create: productsInCart.map((cartProduct) => ({
-              productId: cartProduct.productId,
-              quantity: cartProduct.quantity,
-              price: cartProduct.price,
-            })),
-          },
-        },
-      });
-
-      return res.status(201).json(order);
-    } catch (err) {
-      console.log(err);
-      return res.status(400).json(err);
-    }
-  }
-
   async testingOrder(req: Request, res: Response) {
     try {
       const userId = req.currentUser?.id;
@@ -596,9 +548,45 @@ export class OrderController {
         });
       }
 
+      const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+
       const actualOrder = await prisma.order.findUnique({
         where: {
           id: order.id,
+        },
+        include: {
+          address: true,
+          orderProducts: {
+            include: {
+              product: true,
+              orderToProductTopping: true,
+            },
+          },
+        },
+      });
+
+      actualOrder?.orderProducts.forEach((orderProduct) => {
+        line_items.push({
+          quantity: orderProduct.quantity,
+          price_data: {
+            currency: "BRL",
+            product_data: {
+              name: orderProduct.product.name,
+            },
+            unit_amount: orderProduct.price * 100,
+          },
+        });
+      });
+
+      const session = await stripe.checkout.sessions.create({
+        line_items,
+        mode: "payment",
+        billing_address_collection: "auto",
+        client_reference_id: actualOrder?.userId,
+        success_url: `${process.env.FRONTEND_URL}/menu?success=1`,
+        cancel_url: `${process.env.FRONTEND_URL}/menu?canceled=1`,
+        metadata: {
+          orderId: order.id,
         },
       });
 
@@ -617,7 +605,7 @@ export class OrderController {
         },
       });
 
-      return res.status(201).json(actualOrder);
+      return res.status(201).json({ url: session.url });
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -735,5 +723,40 @@ export class OrderController {
       console.log(err);
       return res.status(400).json(err);
     }
+  }
+
+  async confirmOrder(req: Request, res: Response) {
+    const body = req.body;
+    const signature = req.headers["stripe-signature"] as string;
+    let event: Stripe.Event;
+
+    const payloadString = JSON.stringify(body);
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK! as string
+      );
+    } catch (err: any) {
+      console.log(err);
+      return res.status(400).json(`Web hook Error: ${err}`);
+    }
+
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    if (event.type === "checkout.session.completed") {
+      const order = await prisma.order.update({
+        where: {
+          id: session?.metadata?.orderId,
+        },
+        data: {
+          isPaid: true,
+        },
+        include: {
+          orderProducts: true,
+        },
+      });
+    }
+    return res.status(200).json({ recived: true });
   }
 }

@@ -1,8 +1,14 @@
-import { Router } from "express";
+import express, { Router, Request, Response } from "express";
 import isAuth from "../middlewares/isAuth";
 import { authMiddleware } from "../middlewares/attachCurrentUser";
 import { isAdmin } from "../middlewares/isAdmin";
 import { OrderController } from "../Controller/OrderController";
+import bodyParser from "body-parser";
+import Stripe from "stripe";
+import { stripe } from "../libs/stripe";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const routes = Router();
 const orderController = new OrderController();
@@ -16,7 +22,12 @@ routes.delete(
   orderController.removeProductt
 );
 routes.put("/removeAll", authMiddleware, orderController.removeAll);
-routes.post("/checkout", authMiddleware, orderController.checkout);
+routes.post(
+  "/webhook",
+  // express.raw({ type: "application/json" }),
+  orderController.confirmOrder
+);
+
 routes.post(
   "/increaseQuantityProd",
 
