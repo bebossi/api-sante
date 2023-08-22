@@ -44,7 +44,7 @@ export class ProductController {
 
   async createTopping(req: Request, res: Response) {
     try {
-      const { name, description, price, quantity, image, productId } = req.body;
+      const { name, description, price, image, productId } = req.body;
 
       const topping = await prisma.topping.create({
         data: {
@@ -194,6 +194,40 @@ export class ProductController {
       const { categoryId } = req.params;
 
       const category = await prisma.category.findUnique({
+        where: {
+          id: categoryId,
+        },
+      });
+
+      return res.status(200).json(category);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async deleteTopping(req: Request, res: Response) {
+    try {
+      const { toppingId } = req.body;
+
+      const topping = await prisma.topping.delete({
+        where: {
+          id: toppingId,
+        },
+      });
+
+      return res.status(200).json(topping);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async deleteCategory(req: Request, res: Response) {
+    try {
+      const { categoryId } = req.body;
+
+      const category = await prisma.category.delete({
         where: {
           id: categoryId,
         },
