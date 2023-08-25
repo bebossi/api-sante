@@ -93,17 +93,19 @@ model OrderToProductTopping {
 }
 
 model Order {
-  id            String           @id @default(uuid())
-  userId        String
-  orderProducts OrderToProduct[]
-  subTotal      Int
-  total         Int
-  createdAt     DateTime         @default(now())
-  addressId     String
-  isPaid        Boolean          @default(false)
+  id                     String           @id @default(uuid())
+  userId                 String
+  orderProducts          OrderToProduct[]
+  subTotal               Int
+  total                  Int
+  createdAt              DateTime         @default(now())
+  addressId              String
+  isPaid                 Boolean          @default(false)
+  avaliableAppointmentId String
 
-  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id])
+  avaliableAppointment AvailableAppointment @relation(fields: [avaliableAppointmentId], references: [id])
+  address              Address              @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  user                 User                 @relation(fields: [userId], references: [id])
 }
 
 model Cart {
@@ -147,4 +149,11 @@ model OrderToProduct {
 
   product Product @relation(fields: [productId], references: [id])
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model AvailableAppointment {
+  id          String   @id @default(uuid())
+  date        DateTime
+  isAvailable Boolean
+  orders      Order[]
 }
