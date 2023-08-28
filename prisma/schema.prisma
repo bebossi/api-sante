@@ -153,7 +153,8 @@ model OrderToProduct {
 
 model AvailableAppointment {
   id          String   @id @default(uuid())
-  date        DateTime
+  startDate   DateTime
+  endTime     String
   isAvailable Boolean
   orders      Order[]
 }
