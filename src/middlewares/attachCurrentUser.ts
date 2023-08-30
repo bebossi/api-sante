@@ -19,6 +19,9 @@ export async function authMiddleware(
     const { authorization } = req.headers;
 
     if (!authorization) {
+      if (req.path === "/signup") {
+        return next();
+      }
       return res.sendStatus(403);
     }
 

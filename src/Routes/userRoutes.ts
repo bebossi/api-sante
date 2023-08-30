@@ -6,7 +6,7 @@ import { UserController } from "../Controller/UserController";
 const routes = Router();
 const userController = new UserController();
 
-routes.post("/signup", userController.signUp);
+routes.post("/signup", authMiddleware, userController.signUp);
 routes.post("/login", userController.login);
 routes.put("/update", isAuth, authMiddleware, userController.updateUser);
 routes.get(

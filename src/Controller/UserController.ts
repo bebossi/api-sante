@@ -11,12 +11,25 @@ export class UserController {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     try {
-      const { name, password, email } = req.body;
+      const { password, email } = req.body;
       const hashedPassword = await bcrypt.hash(password, salt);
+
+      if (req.currentUser) {
+        const user = await prisma.user.update({
+          where: {
+            id: req.currentUser.id,
+          },
+          data: {
+            email,
+            password: hashedPassword,
+            role: "user",
+          },
+        });
+        return res.status(200).json(user);
+      }
 
       const newUser = await prisma.user.create({
         data: {
-          name,
           email,
           password: hashedPassword,
         },
@@ -90,6 +103,7 @@ export class UserController {
         user: {
           name: user.name,
           email: user.email,
+          role: user.role,
         },
         token: token,
       });
