@@ -99,13 +99,13 @@ model Order {
   subTotal               Int
   total                  Int
   createdAt              DateTime         @default(now())
-  addressId              String
+  addressId              String?
   isPaid                 Boolean          @default(false)
-  avaliableAppointmentId String
+  avaliableAppointmentId String?
 
-  avaliableAppointment AvailableAppointment @relation(fields: [avaliableAppointmentId], references: [id])
-  address              Address              @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  user                 User                 @relation(fields: [userId], references: [id])
+  avaliableAppointment AvailableAppointment? @relation(fields: [avaliableAppointmentId], references: [id])
+  address              Address?              @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  user                 User                  @relation(fields: [userId], references: [id])
 }
 
 model Cart {

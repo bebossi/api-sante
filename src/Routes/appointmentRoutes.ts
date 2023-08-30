@@ -13,7 +13,17 @@ const prisma = new PrismaClient();
 const routes = Router();
 const appointmentController = new AppointmentController();
 
-routes.post("/createAppointment", appointmentController.createAppointment);
-routes.get("/getAppointments", appointmentController.getAppointments);
+routes.post(
+  "/createAppointment",
+  isAuth,
+  isAdmin,
+  appointmentController.createAppointment
+);
+routes.get(
+  "/getAppointments",
+  isAuth,
+  isAdmin,
+  appointmentController.getAppointments
+);
 
 export default routes;

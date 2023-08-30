@@ -7,19 +7,44 @@ import { ProductController } from "../Controller/ProductController";
 const routes = Router();
 const productController = new ProductController();
 
-routes.post("/create", productController.createProduct);
+routes.post("/create", isAuth, isAdmin, productController.createProduct);
 routes.get("/getProducts", productController.getProducts);
 routes.get("/getProduct/:productId", productController.getProduct);
-routes.put("/updateProduct/:productId", productController.updateProduct);
-routes.delete("/delete", productController.deleteProduct);
-routes.post("/createCategory", productController.createCategory);
+routes.put(
+  "/updateProduct/:productId",
+  isAuth,
+  isAdmin,
+  productController.updateProduct
+);
+routes.delete("/delete", isAuth, isAdmin, productController.deleteProduct);
+routes.post(
+  "/createCategory",
+  isAuth,
+  isAdmin,
+  productController.createCategory
+);
 routes.get("/getCategories", productController.getCategories);
-routes.post("/category", productController.createCategory);
-routes.get("/getCategory/:categoryId", productController.getCategory);
-routes.delete("/deleteCategory", productController.deleteCategory);
-routes.post("/createTopping", productController.createTopping);
+// routes.post("/category", productController.createCategory);
+routes.get(
+  "/getCategory/:categoryId",
+  isAuth,
+  isAdmin,
+  productController.getCategory
+);
+routes.delete(
+  "/deleteCategory",
+  isAuth,
+  isAdmin,
+  productController.deleteCategory
+);
+routes.post("/createTopping", isAuth, isAdmin, productController.createTopping);
 routes.get("/getToppings", productController.getToppings);
 routes.get("/getTopping/:toppingId", productController.getTopping);
-routes.delete("/deleteTopping", productController.deleteTopping);
+routes.delete(
+  "/deleteTopping",
+  isAuth,
+  isAdmin,
+  productController.deleteTopping
+);
 
 export default routes;

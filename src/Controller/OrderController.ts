@@ -520,10 +520,17 @@ export class OrderController {
         },
       });
 
+      if (
+        (avaliableAppointmentId && addressId) ||
+        (!avaliableAppointmentId && !addressId)
+      ) {
+        return res.status(500).json("error");
+      }
+
       const order = await prisma.order.create({
         data: {
-          avaliableAppointmentId: avaliableAppointmentId,
-          addressId: addressId,
+          avaliableAppointmentId: avaliableAppointmentId || undefined,
+          addressId: addressId || undefined,
           userId: userId as string,
           subTotal: Number(cart?.subtotal),
           total: 0,

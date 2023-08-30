@@ -1,14 +1,8 @@
-import express, { Router, Request, Response } from "express";
+import { Router } from "express";
 import isAuth from "../middlewares/isAuth";
 import { authMiddleware } from "../middlewares/attachCurrentUser";
 import { isAdmin } from "../middlewares/isAdmin";
 import { OrderController } from "../Controller/OrderController";
-import bodyParser from "body-parser";
-import Stripe from "stripe";
-import { stripe } from "../libs/stripe";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 const routes = Router();
 const orderController = new OrderController();
@@ -43,7 +37,7 @@ routes.post(
 );
 routes.get("/cart", authMiddleware, orderController.getCart);
 routes.get("/get", orderController.deletingAll);
-routes.get("/getOrders", orderController.getOrders);
-routes.get("/getOrder/:orderId", orderController.getOrder);
+routes.get("/getOrders", isAuth, isAdmin, orderController.getOrders);
+routes.get("/getOrder/:orderId", isAuth, isAdmin, orderController.getOrder);
 
 export default routes;
