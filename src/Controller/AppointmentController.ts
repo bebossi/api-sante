@@ -25,7 +25,14 @@ export class AppointmentController {
 
   async getAppointments(req: Request, res: Response) {
     try {
+      const currentDate = new Date();
+
       const appointments = await prisma.availableAppointment.findMany({
+        where: {
+          startDate: {
+            gte: currentDate,
+          },
+        },
         orderBy: {
           startDate: "asc",
         },
