@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { generateToken } from "../config/jwt.config";
-import auth0Client from "../config/auth0.config";
 
 const prisma = new PrismaClient();
 
@@ -138,7 +137,6 @@ export class UserController {
   async getCurrentUser(req: Request, res: Response) {
     try {
       const userId = req.currentUser?.id;
-
       const user = await prisma.user.findUnique({
         where: {
           id: userId,
@@ -149,7 +147,6 @@ export class UserController {
           orders: true,
         },
       });
-
       return res.status(200).json(user);
     } catch (err) {
       console.log(err);

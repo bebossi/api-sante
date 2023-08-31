@@ -11,7 +11,7 @@ routes.post("/login", userController.login);
 routes.put("/update", isAuth, authMiddleware, userController.updateUser);
 routes.get(
   "/currentUser",
-  isAuth,
+
   authMiddleware,
   userController.getCurrentUser
 );

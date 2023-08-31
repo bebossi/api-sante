@@ -26,8 +26,6 @@ app.use(
 );
 
 // app.use(bodyParser.raw({ type: "application/json" }));
-app.use(cors());
-// app.use(express.json());
 app.use(
   (
     req: express.Request,
@@ -42,6 +40,8 @@ app.use(
     }
   }
 );
+app.use(cors());
+// app.use(express.json());
 app.use(express.raw({ type: "application/json" }));
 app.use(routes);
 app.listen(process.env.PORT_EXPRESS, () => {
