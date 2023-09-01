@@ -767,4 +767,40 @@ export class OrderController {
     }
     return res.status(200).json({ recived: true });
   }
+
+  async getOrdersByClient(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+
+      const orders = await prisma.order.findMany({
+        where: {
+          userId: userId,
+        },
+      });
+
+      return res.status(200).json(orders);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async getOrderByClient(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+      const { orderId } = req.body;
+
+      const order = await prisma.order.findUnique({
+        where: {
+          userId: userId,
+          id: orderId,
+        },
+      });
+
+      return res.status(200).json(order);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
 }

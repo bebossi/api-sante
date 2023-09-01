@@ -39,5 +39,17 @@ routes.get("/cart", isAuth, authMiddleware, orderController.getCart);
 routes.get("/get", orderController.deletingAll);
 routes.get("/getOrders", isAuth, isAdmin, orderController.getOrders);
 routes.get("/getOrder/:orderId", isAuth, isAdmin, orderController.getOrder);
+routes.get(
+  "/ordersByClient",
+  isAuth,
+  authMiddleware,
+  orderController.getOrdersByClient
+);
+routes.get(
+  "/orderByClient/:orderId",
+  isAuth,
+  authMiddleware,
+  orderController.getOrderByClient
+);
 
 export default routes;
