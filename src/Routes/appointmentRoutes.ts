@@ -25,5 +25,23 @@ routes.get(
   isAdmin,
   appointmentController.getAppointments
 );
+routes.post(
+  "/createIsOpen",
+  isAuth,
+  isAdmin,
+  appointmentController.createIsRestaurantOpen
+);
+routes.get(
+  "/getIsOpen",
+  isAuth,
+  isAdmin,
+  appointmentController.isRestaurantOpen
+);
+routes.put(
+  "/updateIsOpen",
+  isAuth,
+  isAdmin,
+  appointmentController.isRestaurantOpenUpdate
+);
 
 export default routes;

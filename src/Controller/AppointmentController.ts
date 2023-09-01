@@ -44,4 +44,51 @@ export class AppointmentController {
       return res.status(404).json(err);
     }
   }
+
+  async createIsRestaurantOpen(req: Request, res: Response) {
+    try {
+      const isOpen = await prisma.isRestaurantOpen.create({
+        data: {
+          isOpen: true,
+          updatedDate: new Date(),
+        },
+      });
+
+      return res.status(200).json(isOpen);
+    } catch (err) {
+      console.log(err);
+      return res.status(404).json(err);
+    }
+  }
+
+  async isRestaurantOpen(req: Request, res: Response) {
+    try {
+      const isOpen = await prisma.isRestaurantOpen.findFirst();
+
+      return res.status(200).json(isOpen);
+    } catch (err) {
+      console.log(err);
+      return res.status(404).json(err);
+    }
+  }
+
+  async isRestaurantOpenUpdate(req: Request, res: Response) {
+    try {
+      const isOpen = await prisma.isRestaurantOpen.findFirst();
+
+      await prisma.isRestaurantOpen.update({
+        where: {
+          id: isOpen?.id,
+        },
+        data: {
+          isOpen: !isOpen?.isOpen,
+        },
+      });
+
+      return res.status(200).json("Updated successfully");
+    } catch (err) {
+      console.log(err);
+      return res.status(404).json(err);
+    }
+  }
 }

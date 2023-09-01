@@ -158,3 +158,9 @@ model AvailableAppointment {
   isAvailable Boolean
   orders      Order[]
 }
+
+model isRestaurantOpen {
+  id          String   @id @default(uuid())
+  isOpen      Boolean
+  updatedDate DateTime
+}
