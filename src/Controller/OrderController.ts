@@ -723,6 +723,7 @@ export class OrderController {
             },
           },
           user: true,
+          avaliableAppointment: true,
         },
       });
 
@@ -788,12 +789,28 @@ export class OrderController {
   async getOrderByClient(req: Request, res: Response) {
     try {
       const userId = req.currentUser?.id;
-      const { orderId } = req.body;
+      const { orderId } = req.params;
 
       const order = await prisma.order.findUnique({
         where: {
           userId: userId,
           id: orderId,
+        },
+        include: {
+          address: true,
+          orderProducts: {
+            include: {
+              product: true,
+              orderToProductTopping: {
+                include: {
+                  topping: true,
+                  orderToProduct: true,
+                },
+              },
+            },
+          },
+          user: true,
+          avaliableAppointment: true,
         },
       });
 

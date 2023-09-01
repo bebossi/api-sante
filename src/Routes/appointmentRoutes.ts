@@ -22,7 +22,7 @@ routes.post(
 routes.get(
   "/getAppointments",
   isAuth,
-  isAdmin,
+
   appointmentController.getAppointments
 );
 routes.post(
