@@ -760,6 +760,7 @@ export class OrderController {
         },
         data: {
           isPaid: true,
+          status: "Pagamento confirmado",
         },
         include: {
           orderProducts: true,
@@ -818,6 +819,27 @@ export class OrderController {
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
+    }
+  }
+
+  async statusOrder(req: Request, res: Response) {
+    try {
+      const { orderId } = req.params;
+      const { status } = req.body;
+
+      const order = await prisma.order.update({
+        where: {
+          id: orderId,
+        },
+        data: {
+          status: status,
+        },
+      });
+
+      return res.status(200).json(order);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err); 
     }
   }
 }

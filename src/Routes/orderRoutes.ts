@@ -51,5 +51,11 @@ routes.get(
   authMiddleware,
   orderController.getOrderByClient
 );
+routes.put(
+  "/statusOrder/:orderId",
+  isAuth,
+  isAdmin,
+  orderController.statusOrder
+);
 
 export default routes;

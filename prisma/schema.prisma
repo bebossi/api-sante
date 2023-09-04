@@ -102,6 +102,7 @@ model Order {
   addressId              String?
   isPaid                 Boolean          @default(false)
   avaliableAppointmentId String?
+  status                 String           @default("Confirmando pagamento")
 
   avaliableAppointment AvailableAppointment? @relation(fields: [avaliableAppointmentId], references: [id])
   address              Address?              @relation(fields: [addressId], references: [id], onDelete: Cascade)
