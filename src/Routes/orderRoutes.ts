@@ -38,6 +38,7 @@ routes.post(
 routes.get("/cart", isAuth, authMiddleware, orderController.getCart);
 routes.get("/get", orderController.deletingAll);
 routes.get("/getOrders", isAuth, isAdmin, orderController.getOrders);
+routes.get("/filterOrders", isAuth, isAdmin, orderController.filterOrders);
 routes.get("/getOrder/:orderId", isAuth, isAdmin, orderController.getOrder);
 routes.get(
   "/ordersByClient",

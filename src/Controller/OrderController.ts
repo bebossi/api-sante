@@ -701,6 +701,32 @@ export class OrderController {
     }
   }
 
+  async filterOrders(req: Request, res: Response) {
+    try {
+      const { isPaid, status, avaliableAppointment } = req.query;
+      let query: any = {};
+
+      if (isPaid) {
+        query.isPaid = isPaid === "true";
+      }
+      if (status) query.status = status;
+      if (avaliableAppointment)
+        query.avaliableAppointment = avaliableAppointment;
+
+      const orders = await prisma.order.findMany({
+        where: query,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      return res.status(200).json(orders);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
   async getOrder(req: Request, res: Response) {
     try {
       const { orderId } = req.params;
@@ -839,7 +865,7 @@ export class OrderController {
       return res.status(200).json(order);
     } catch (err) {
       console.log(err);
-      return res.status(400).json(err); 
+      return res.status(400).json(err);
     }
   }
 }
