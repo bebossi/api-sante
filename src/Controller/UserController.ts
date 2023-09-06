@@ -34,7 +34,9 @@ export class UserController {
         },
       });
 
-      return res.status(200).json(newUser);
+      const token = generateToken(newUser);
+
+      return res.status(200).json({ newUser, token });
     } catch (err) {
       console.log(err);
     }
@@ -92,11 +94,11 @@ export class UserController {
           },
         });
       }
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
+      // res.cookie("token", token, {
+      //   httpOnly: true,
+      //   secure: true,
+      //   sameSite: "strict",
+      // });
 
       return res.status(200).json({
         user: {

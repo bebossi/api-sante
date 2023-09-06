@@ -129,162 +129,162 @@ export class OrderController {
     }
   }
 
-  async putQuantity(req: Request, res: Response) {
-    try {
-      const { productId, toppings, quantity } = req.body;
+  // async putQuantity(req: Request, res: Response) {
+  //   try {
+  //     const { productId, toppings, quantity } = req.body;
 
-      const userId = req.currentUser?.id as string;
+  //     const userId = req.currentUser?.id as string;
 
-      const cart = await prisma.cart.findUnique({
-        where: {
-          userId: userId,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              product: true,
-              cartToProductToppings: true,
-            },
-          },
-        },
-      });
+  //     const cart = await prisma.cart.findUnique({
+  //       where: {
+  //         userId: userId,
+  //       },
+  //       include: {
+  //         cartProducts: {
+  //           include: {
+  //             product: true,
+  //             cartToProductToppings: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      const addProduct = await prisma.product.findUnique({
-        where: {
-          id: productId,
-        },
-        include: {
-          toppings: {
-            include: {
-              cartToProductToppings: true,
-            },
-          },
-        },
-      });
+  //     const addProduct = await prisma.product.findUnique({
+  //       where: {
+  //         id: productId,
+  //       },
+  //       include: {
+  //         toppings: {
+  //           include: {
+  //             cartToProductToppings: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      if (!addProduct) {
-        return res.status(404).json({ error: "Product not found" });
-      }
+  //     if (!addProduct) {
+  //       return res.status(404).json({ error: "Product not found" });
+  //     }
 
-      let existingProduct: CartToProduct | undefined;
+  //     let existingProduct: CartToProduct | undefined;
 
-      existingProduct = cart?.cartProducts.find((item) => {
-        return item.productId === productId;
-      });
+  //     existingProduct = cart?.cartProducts.find((item) => {
+  //       return item.productId === productId;
+  //     });
 
-      let toppingsPrice = 0;
+  //     let toppingsPrice = 0;
 
-      if (existingProduct) {
-        for (const topping of toppings) {
-          const selectedTopping = addProduct.toppings.find((item) => {
-            return item.id === topping.topping.id;
-          });
-          if (selectedTopping) {
-            await prisma.cartToProductTopping.create({
-              data: {
-                cartToProdId: existingProduct.id,
-                toppingId: String(topping.topping.id),
-                quantity: topping.quantity,
-              },
-            });
-            toppingsPrice += selectedTopping.price * Number(topping.quantity);
-          }
-        }
+  //     if (existingProduct) {
+  //       for (const topping of toppings) {
+  //         const selectedTopping = addProduct.toppings.find((item) => {
+  //           return item.id === topping.topping.id;
+  //         });
+  //         if (selectedTopping) {
+  //           await prisma.cartToProductTopping.create({
+  //             data: {
+  //               cartToProdId: existingProduct.id,
+  //               toppingId: String(topping.topping.id),
+  //               quantity: topping.quantity,
+  //             },
+  //           });
+  //           toppingsPrice += selectedTopping.price * Number(topping.quantity);
+  //         }
+  //       }
 
-        await prisma.cartToProduct.update({
-          where: {
-            id: existingProduct.id,
-          },
-          data: {
-            quantity: existingProduct.quantity + 1,
-            price:
-              existingProduct.price + Number(addProduct.price) + toppingsPrice,
-          },
-        });
-      } else {
-        existingProduct = await prisma.cartToProduct.create({
-          data: {
-            cartId: cart?.id as string,
-            productId: productId,
-            quantity: 1,
-            price: Number(addProduct.price),
-          },
-        });
+  //       await prisma.cartToProduct.update({
+  //         where: {
+  //           id: existingProduct.id,
+  //         },
+  //         data: {
+  //           quantity: existingProduct.quantity + 1,
+  //           price:
+  //             existingProduct.price + Number(addProduct.price) + toppingsPrice,
+  //         },
+  //       });
+  //     } else {
+  //       existingProduct = await prisma.cartToProduct.create({
+  //         data: {
+  //           cartId: cart?.id as string,
+  //           productId: productId,
+  //           quantity: 1,
+  //           price: Number(addProduct.price),
+  //         },
+  //       });
 
-        for (const topping of toppings) {
-          const selectedTopping = addProduct.toppings.find(
-            (item) => item.id === topping.topping.id
-          );
+  //       for (const topping of toppings) {
+  //         const selectedTopping = addProduct.toppings.find(
+  //           (item) => item.id === topping.topping.id
+  //         );
 
-          if (selectedTopping) {
-            await prisma.cartToProductTopping.create({
-              data: {
-                toppingId: selectedTopping.id,
-                cartToProdId: existingProduct.id,
-                quantity: Number(topping.quantity),
-              },
-            });
-            toppingsPrice += selectedTopping.price * Number(topping.quantity); // Calculate the toppings price
-          }
-        }
+  //         if (selectedTopping) {
+  //           await prisma.cartToProductTopping.create({
+  //             data: {
+  //               toppingId: selectedTopping.id,
+  //               cartToProdId: existingProduct.id,
+  //               quantity: Number(topping.quantity),
+  //             },
+  //           });
+  //           toppingsPrice += selectedTopping.price * Number(topping.quantity); // Calculate the toppings price
+  //         }
+  //       }
 
-        await prisma.cartToProduct.update({
-          where: {
-            id: existingProduct.id,
-          },
-          data: {
-            price: Number(addProduct.price) + Number(toppingsPrice),
-          },
-        });
-      }
+  //       await prisma.cartToProduct.update({
+  //         where: {
+  //           id: existingProduct.id,
+  //         },
+  //         data: {
+  //           price: Number(addProduct.price) + Number(toppingsPrice),
+  //         },
+  //       });
+  //     }
 
-      const cartWithNewProduct = await prisma.cart.findUnique({
-        where: {
-          id: cart?.id,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              product: true,
-            },
-          },
-        },
-      });
+  //     const cartWithNewProduct = await prisma.cart.findUnique({
+  //       where: {
+  //         id: cart?.id,
+  //       },
+  //       include: {
+  //         cartProducts: {
+  //           include: {
+  //             product: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      const subtotal = cartWithNewProduct?.cartProducts.reduce(
-        (total, cartProduct) => {
-          return total + Number(cartProduct.price);
-        },
-        0
-      );
+  //     const subtotal = cartWithNewProduct?.cartProducts.reduce(
+  //       (total, cartProduct) => {
+  //         return total + Number(cartProduct.price);
+  //       },
+  //       0
+  //     );
 
-      const updatedCart = await prisma.cart.update({
-        where: {
-          id: cart?.id,
-        },
-        data: {
-          cartProducts: {
-            connect: {
-              id: existingProduct.id,
-            },
-          },
-          subtotal: subtotal,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              cartToProductToppings: true,
-            },
-          },
-        },
-      });
+  //     const updatedCart = await prisma.cart.update({
+  //       where: {
+  //         id: cart?.id,
+  //       },
+  //       data: {
+  //         cartProducts: {
+  //           connect: {
+  //             id: existingProduct.id,
+  //           },
+  //         },
+  //         subtotal: subtotal,
+  //       },
+  //       include: {
+  //         cartProducts: {
+  //           include: {
+  //             cartToProductToppings: true,
+  //           },
+  //         },
+  //       },
+  //     });
 
-      return res.status(200).json(updatedCart);
-    } catch (err) {
-      console.log(err);
-      return res.status(400).json(err);
-    }
-  }
+  //     return res.status(200).json(updatedCart);
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res.status(400).json(err);
+  //   }
+  // }
 
   async removeProductt(req: Request, res: Response) {
     try {
@@ -667,15 +667,6 @@ export class OrderController {
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
-    }
-  }
-
-  async deletingAll(req: Request, res: Response) {
-    try {
-      await prisma.cart.deleteMany();
-      return res.status(204).json("good");
-    } catch (err) {
-      console.log(err);
     }
   }
 

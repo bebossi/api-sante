@@ -7,8 +7,7 @@ import { OrderController } from "../Controller/OrderController";
 const routes = Router();
 const orderController = new OrderController();
 
-// routes.put("/add", isAuth, authMiddleware, orderController.addProduct);
-routes.put("/remove", isAuth, authMiddleware, orderController.removeProduct);
+// routes.put("/remove", isAuth, authMiddleware, orderController.removeProduct);
 routes.delete(
   "/removeProduct",
   isAuth,
@@ -22,12 +21,11 @@ routes.post(
   orderController.confirmOrder
 );
 
-routes.post(
-  "/increaseQuantityProd",
-
-  authMiddleware,
-  orderController.putQuantity
-);
+// routes.post(
+//   "/increaseQuantityProd",
+//   authMiddleware,
+//   orderController.putQuantity
+// );
 routes.post("/addProduct", authMiddleware, orderController.addProduct);
 routes.post(
   "/testCheckout",
@@ -36,7 +34,6 @@ routes.post(
   orderController.testingOrder
 );
 routes.get("/cart", isAuth, authMiddleware, orderController.getCart);
-routes.get("/get", orderController.deletingAll);
 routes.get("/getOrders", isAuth, isAdmin, orderController.getOrders);
 routes.get("/filterOrders", isAuth, isAdmin, orderController.filterOrders);
 routes.get("/getOrder/:orderId", isAuth, isAdmin, orderController.getOrder);
