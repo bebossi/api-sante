@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { generateToken } from "../config/jwt.config";
+import { MemoryStore } from "express-session";
 
 const prisma = new PrismaClient();
 
@@ -39,6 +40,48 @@ export class UserController {
       return res.status(200).json({ newUser, token });
     } catch (err) {
       console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async loginGoogleSucces(req: Request, res: Response) {
+    try {
+      if (req.user) {
+        console.log(req.user);
+        const reqUser = req.user as Record<string, any>;
+
+        const user = await prisma.user.findUnique({
+          where: {
+            id: reqUser.id,
+          },
+        });
+
+        if (!user) {
+          await prisma.user.create({
+            data: {
+              id: reqUser.id,
+              email: reqUser.email,
+              name: reqUser.displayName,
+            },
+          });
+        }
+
+        return res.status(200).json({
+          error: false,
+          message: "Login feito com sucesso",
+          user: reqUser,
+          // token: token,
+          redirectUrl: process.env.FRONTEND_URL,
+        });
+      } else {
+        res.status(403).json({
+          error: true,
+          message: "Not authorized",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
     }
   }
 

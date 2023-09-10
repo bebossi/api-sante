@@ -2,28 +2,48 @@ import express from "express";
 import "dotenv/config";
 import routes from "./Routes";
 import expressSession from "express-session";
-import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+// import { PrismaClient } from "@prisma/client";
 import cors from "cors";
-import bodyParser from "body-parser";
+import passport from "passport";
+import cookiesSession from "cookie-session";
+import "../src/config/passport";
 
 const app = express();
 
+// app.use(
+//   cookiesSession({
+//     name: "session",
+//     keys: ["cyber"],
+//     maxAge: 24 * 60 * 60 * 100,
+//   })
+// );
 app.use(
   expressSession({
-    cookie: {
-      maxAge: 60 * 60 * 1000,
-    },
-    secret: process.env.TOKEN_SIGN_SECRET!,
-    resave: false,
-    saveUninitialized: false,
-    store: new PrismaSessionStore(new PrismaClient(), {
-      checkPeriod: 2 * 60 * 1000,
-      dbRecordIdIsSessionId: true,
-      dbRecordIdFunction: undefined,
-    }),
+    secret: process.env.TOKEN_SIGN_SECRET as string,
+    resave: true,
+    saveUninitialized: true,
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// app.use(
+//   expressSession({
+//     cookie: {
+//       maxAge: 60 * 60 * 1000,
+//     },
+//     secret: process.env.TOKEN_SIGN_SECRET!,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: new PrismaSessionStore(new PrismaClient(), {
+//       checkPeriod: 2 * 60 * 1000,
+//       dbRecordIdIsSessionId: true,
+//       dbRecordIdFunction: undefined,
+//     }),
+//   })
+// );
 
 // app.use(bodyParser.raw({ type: "application/json" }));
 app.use(
