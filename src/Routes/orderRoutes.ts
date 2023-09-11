@@ -26,17 +26,17 @@ routes.post(
 //   authMiddleware,
 //   orderController.putQuantity
 // );
-routes.post("/addProduct", authMiddleware, orderController.addProduct);
+routes.post("/addProduct", isAuth, authMiddleware, orderController.addProduct);
 routes.post(
   "/testCheckout",
 
   authMiddleware,
   orderController.testingOrder
 );
-routes.get("/cart", isAuth, authMiddleware, orderController.getCart);
-routes.get("/getOrders", isAuth, isAdmin, orderController.getOrders);
-routes.get("/filterOrders", isAuth, isAdmin, orderController.filterOrders);
-routes.get("/getOrder/:orderId", isAuth, isAdmin, orderController.getOrder);
+routes.get("/cart", authMiddleware, orderController.getCart);
+routes.get("/getOrders", isAdmin, orderController.getOrders);
+routes.get("/filterOrders", isAdmin, orderController.filterOrders);
+routes.get("/getOrder/:orderId", isAdmin, orderController.getOrder);
 routes.get(
   "/ordersByClient",
   isAuth,

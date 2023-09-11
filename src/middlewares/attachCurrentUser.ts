@@ -16,16 +16,18 @@ export async function authMiddleware(
   next: NextFunction
 ) {
   try {
-    const { authorization } = req.headers;
+    const cookie = req.headers.cookie;
+    const token = cookie?.split(";")[0].split("=")[1];
+    // const { authorization } = req.headers;
 
-    if (!authorization) {
+    if (!token) {
       if (req.path === "/signup") {
         return next();
       }
       return res.sendStatus(403);
     }
 
-    const token = authorization.replace("Bearer", "").trim();
+    // const token = authorization.replace("Bearer", "").trim();
     const secret = process.env.TOKEN_SIGN_SECRET as string;
 
     const data = jwt.verify(token, secret) as User;

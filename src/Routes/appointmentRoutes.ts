@@ -19,7 +19,11 @@ routes.post(
   isAdmin,
   appointmentController.createAppointment
 );
-routes.get("/getAppointments", isAuth, appointmentController.getAppointments);
+routes.get(
+  "/getAppointments",
+  authMiddleware,
+  appointmentController.getAppointments
+);
 routes.post(
   "/createIsOpen",
   isAuth,
@@ -28,7 +32,6 @@ routes.post(
 );
 routes.get(
   "/getIsOpen",
-  isAuth,
   authMiddleware,
   appointmentController.isRestaurantOpen
 );

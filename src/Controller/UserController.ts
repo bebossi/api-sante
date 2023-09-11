@@ -74,14 +74,10 @@ export class UserController {
 
         const token = generateToken(createdUser!);
 
-        res.cookie(
-          "token",
-          token
-          // {
-          //   httpOnly: true,
-          //   // secure: true,
-          // }
-        );
+        res.cookie("token", token, {
+          httpOnly: true,
+          // secure: true,
+        });
 
         res.redirect(process.env.FRONTEND_URL as string);
 
