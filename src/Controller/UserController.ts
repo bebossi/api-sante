@@ -46,8 +46,8 @@ export class UserController {
 
   async loginGoogleSucces(req: Request, res: Response) {
     try {
+      console.log(req.user);
       if (req.user) {
-        console.log(req.user);
         const reqUser = req.user as Record<string, any>;
 
         const user = await prisma.user.findUnique({
@@ -62,23 +62,44 @@ export class UserController {
               id: reqUser.id,
               email: reqUser.email,
               name: reqUser.displayName,
+              role: "user",
             },
           });
         }
 
-        return res.status(200).json({
-          error: false,
-          message: "Login feito com sucesso",
-          user: reqUser,
-          // token: token,
-          redirectUrl: process.env.FRONTEND_URL,
+        const createdUser = await prisma.user.findUnique({
+          where: {
+            id: reqUser.id,
+          },
         });
+
+        const token = generateToken(createdUser!);
+
+        res.cookie(
+          "token",
+          token
+          // {
+          //   httpOnly: true,
+          //   secure: true,
+          // }
+        );
+
+        res.redirect(process.env.FRONTEND_URL as string);
+        // return res.status(200).json({
+        //   error: false,
+        //   message: "Login feito com sucesso",
+        //   user: reqUser,
+        //   // token: token,
+        //   redirectUrl: process.env.FRONTEND_URL || "/",
+        // });
       } else {
         res.status(403).json({
           error: true,
           message: "Not authorized",
         });
       }
+
+      // return res.redirect(process.env.FRONTEND_URL as string);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -137,11 +158,11 @@ export class UserController {
           },
         });
       }
-      // res.cookie("token", token, {
-      //   httpOnly: true,
-      //   secure: true,
-      //   sameSite: "strict",
-      // });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
 
       return res.status(200).json({
         user: {
