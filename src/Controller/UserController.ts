@@ -46,7 +46,6 @@ export class UserController {
 
   async loginGoogleSucces(req: Request, res: Response) {
     try {
-      console.log(req.user);
       if (req.user) {
         const reqUser = req.user as Record<string, any>;
 
@@ -80,11 +79,12 @@ export class UserController {
           token
           // {
           //   httpOnly: true,
-          //   secure: true,
+          //   // secure: true,
           // }
         );
 
         res.redirect(process.env.FRONTEND_URL as string);
+
         // return res.status(200).json({
         //   error: false,
         //   message: "Login feito com sucesso",
@@ -98,8 +98,6 @@ export class UserController {
           message: "Not authorized",
         });
       }
-
-      // return res.redirect(process.env.FRONTEND_URL as string);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -158,11 +156,15 @@ export class UserController {
           },
         });
       }
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
+      res.cookie(
+        "token",
+        token
+        // {
+        //   httpOnly: true,
+        //   secure: true,
+        //   sameSite: "strict",
+        // }
+      );
 
       return res.status(200).json({
         user: {
@@ -170,7 +172,7 @@ export class UserController {
           email: user.email,
           role: user.role,
         },
-        token: token,
+        // token: token,
       });
     } catch (err) {
       console.log(err);

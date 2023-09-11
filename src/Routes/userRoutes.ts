@@ -11,9 +11,14 @@ const userController = new UserController();
 routes.post("/signup", authMiddleware, userController.signUp);
 routes.post("/login", userController.login);
 routes.put("/update", isAuth, authMiddleware, userController.updateUser);
-routes.get("/currentUser", authMiddleware, userController.getCurrentUser);
+routes.get(
+  "/currentUser",
+  isAuth,
+  authMiddleware,
+  userController.getCurrentUser
+);
 routes.post("/guestUser", userController.guestUser);
-routes.post("/address", isAuth, authMiddleware, userController.createAddress);
+routes.post("/address", userController.createAddress);
 
 routes.get("/login/success", userController.loginGoogleSucces);
 

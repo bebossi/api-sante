@@ -7,6 +7,7 @@ import expressSession from "express-session";
 import cors from "cors";
 import passport from "passport";
 import cookiesSession from "cookie-session";
+import cookieParser from "cookie-parser";
 import "../src/config/passport";
 
 const app = express();
@@ -63,10 +64,13 @@ app.use(
 app.use(
   cors({
     credentials: true,
+    origin: process.env.FRONTEND_URL,
   })
 );
 // app.use(express.json());
 app.use(express.raw({ type: "application/json" }));
+app.use(cookieParser());
+
 app.use(routes);
 app.listen(process.env.PORT_EXPRESS, () => {
   console.log("Server listening on port", process.env.PORT_EXPRESS);

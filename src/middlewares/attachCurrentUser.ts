@@ -29,7 +29,9 @@ export async function authMiddleware(
     const secret = process.env.TOKEN_SIGN_SECRET as string;
 
     const data = jwt.verify(token, secret) as User;
-    const user = await prisma.user.findUnique({ where: { id: data.id } });
+    const user = await prisma.user.findUnique({
+      where: { id: data.id, role: data.role },
+    });
 
     req.currentUser = user as User;
 
