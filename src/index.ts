@@ -9,7 +9,7 @@ import cookiesSession from "cookie-session";
 import cookieParser from "cookie-parser";
 import "../src/config/passport";
 
-const app = express();
+export const app = express();
 
 app.use(
   expressSession({
