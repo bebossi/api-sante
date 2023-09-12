@@ -12,13 +12,6 @@ import "../src/config/passport";
 
 const app = express();
 
-// app.use(
-//   cookiesSession({
-//     name: "session",
-//     keys: ["cyber"],
-//     maxAge: 24 * 60 * 60 * 100,
-//   })
-// );
 app.use(
   expressSession({
     secret: process.env.TOKEN_SIGN_SECRET as string,
@@ -46,7 +39,6 @@ app.use(passport.session());
 //   })
 // );
 
-// app.use(bodyParser.raw({ type: "application/json" }));
 app.use(
   (
     req: express.Request,
@@ -63,8 +55,8 @@ app.use(
 );
 app.use(
   cors({
-    credentials: true,
     origin: process.env.FRONTEND_URL,
+    credentials: true,
   })
 );
 // app.use(express.json());

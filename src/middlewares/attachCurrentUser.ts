@@ -16,9 +16,10 @@ export async function authMiddleware(
   next: NextFunction
 ) {
   try {
-    const cookie = req.headers.cookie;
-    const token = cookie?.split(";")[0].split("=")[1];
-    // const { authorization } = req.headers;
+    // console.log(req.cookies.token);
+    const token = req.cookies.token;
+
+    // console.log("token", token);
 
     if (!token) {
       if (req.path === "/signup") {
@@ -26,8 +27,8 @@ export async function authMiddleware(
       }
       return res.sendStatus(403);
     }
-
     // const token = authorization.replace("Bearer", "").trim();
+
     const secret = process.env.TOKEN_SIGN_SECRET as string;
 
     const data = jwt.verify(token, secret) as User;

@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { generateToken } from "../config/jwt.config";
 import { MemoryStore } from "express-session";
+import { prismaExclude } from "../config/exclude";
 
 const prisma = new PrismaClient();
 
@@ -77,7 +78,9 @@ export class UserController {
         res.cookie("token", token, {
           httpOnly: true,
           // secure: true,
+          path: "/",
         });
+        req.headers.authorization?.replace("Bearer", token);
 
         res.redirect(process.env.FRONTEND_URL as string);
 
@@ -152,15 +155,12 @@ export class UserController {
           },
         });
       }
-      res.cookie(
-        "token",
-        token
-        // {
-        //   httpOnly: true,
+      console.log(req.cookies);
+      res.cookie("token", token, {
+        httpOnly: true,
         //   secure: true,
         //   sameSite: "strict",
-        // }
-      );
+      });
 
       return res.status(200).json({
         user: {
@@ -205,12 +205,23 @@ export class UserController {
         where: {
           id: userId,
         },
-        include: {
-          cart: true,
+        // include: {
+        //   cart: true,
+        //   addresses: true,
+        //   orders: true,
+
+        // },
+        select: {
+          password: false,
+          email: true,
+          role: true,
           addresses: true,
+          cart: true,
+          name: true,
           orders: true,
         },
       });
+
       return res.status(200).json(user);
     } catch (err) {
       console.log(err);

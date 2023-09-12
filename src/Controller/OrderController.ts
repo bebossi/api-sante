@@ -122,6 +122,7 @@ export class OrderController {
           },
         },
       });
+
       return res.status(200).json(updatedCart);
     } catch (err) {
       console.log(err);
