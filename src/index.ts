@@ -2,12 +2,9 @@ import express from "express";
 import "dotenv/config";
 import routes from "./Routes";
 import expressSession from "express-session";
-
 import cors from "cors";
 import passport from "passport";
-import cookiesSession from "cookie-session";
 import cookieParser from "cookie-parser";
-import "../src/config/passport.ts";
 
 export const app = express();
 
