@@ -2,8 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { generateToken } from "../config/jwt.config";
-import { MemoryStore } from "express-session";
-import { prismaExclude } from "../config/exclude";
 
 const prisma = new PrismaClient();
 
@@ -80,17 +78,8 @@ export class UserController {
           // secure: true,
           path: "/",
         });
-        req.headers.authorization?.replace("Bearer", token);
 
         res.redirect(process.env.FRONTEND_URL as string);
-
-        // return res.status(200).json({
-        //   error: false,
-        //   message: "Login feito com sucesso",
-        //   user: reqUser,
-        //   // token: token,
-        //   redirectUrl: process.env.FRONTEND_URL || "/",
-        // });
       } else {
         res.status(403).json({
           error: true,

@@ -16,10 +16,7 @@ export async function authMiddleware(
   next: NextFunction
 ) {
   try {
-    // console.log(req.cookies.token);
     const token = req.cookies.token;
-
-    // console.log("token", token);
 
     if (!token) {
       if (req.path === "/signup") {
@@ -27,7 +24,6 @@ export async function authMiddleware(
       }
       return res.sendStatus(403);
     }
-    // const token = authorization.replace("Bearer", "").trim();
 
     const secret = process.env.TOKEN_SIGN_SECRET as string;
 

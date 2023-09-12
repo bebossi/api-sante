@@ -2,8 +2,7 @@ import express from "express";
 import "dotenv/config";
 import routes from "./Routes";
 import expressSession from "express-session";
-// import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-// import { PrismaClient } from "@prisma/client";
+
 import cors from "cors";
 import passport from "passport";
 import cookiesSession from "cookie-session";
@@ -22,22 +21,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-// app.use(
-//   expressSession({
-//     cookie: {
-//       maxAge: 60 * 60 * 1000,
-//     },
-//     secret: process.env.TOKEN_SIGN_SECRET!,
-//     resave: false,
-//     saveUninitialized: false,
-//     store: new PrismaSessionStore(new PrismaClient(), {
-//       checkPeriod: 2 * 60 * 1000,
-//       dbRecordIdIsSessionId: true,
-//       dbRecordIdFunction: undefined,
-//     }),
-//   })
-// );
 
 app.use(
   (
@@ -59,7 +42,6 @@ app.use(
     credentials: true,
   })
 );
-// app.use(express.json());
 app.use(express.raw({ type: "application/json" }));
 app.use(cookieParser());
 
