@@ -1,5 +1,4 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-import { User } from "@prisma/client";
 import passport from "passport";
 
 passport.use(
