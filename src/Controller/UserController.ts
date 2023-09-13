@@ -149,7 +149,7 @@ export class UserController {
         httpOnly: true,
         secure: true,
         path: "/",
-        domain: "https://api-sante.onrender.com",
+        // domain: "https://api-sante.onrender.com",
         sameSite: "none",
       });
 
