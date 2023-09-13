@@ -77,7 +77,8 @@ export class UserController {
           httpOnly: true,
           secure: true,
           path: "/",
-          domain: "https://api-sante.onrender.com",
+          // domain: "https://api-sante.onrender.com",
+          sameSite: "none",
         });
 
         res.redirect(process.env.FRONTEND_URL as string);
