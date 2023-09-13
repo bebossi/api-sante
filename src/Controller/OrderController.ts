@@ -625,6 +625,7 @@ export class OrderController {
     const userId = req.currentUser?.id;
 
     try {
+      // console.log(req.cookies);
       const cart = await prisma.cart.findUnique({
         where: {
           userId: userId,

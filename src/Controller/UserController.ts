@@ -149,6 +149,7 @@ export class UserController {
         httpOnly: true,
         secure: true,
         path: "/",
+        domain: ".onrender.com",
       });
 
       return res.status(200).json({
