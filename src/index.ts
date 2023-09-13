@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 
 export const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(
   expressSession({
     secret: process.env.TOKEN_SIGN_SECRET as string,
