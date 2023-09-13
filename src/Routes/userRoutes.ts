@@ -21,15 +21,6 @@ routes.get(
 routes.post("/guestUser", userController.guestUser);
 routes.post("/address", userController.createAddress);
 
-routes.get("/login/success", userController.loginGoogleSucces);
-
-routes.get("/login/failed", (req, res) => {
-  res.status(401).json({
-    error: true,
-    message: "Login failed",
-  });
-});
-
 routes.get(
   "/google",
   passport.authenticate("google", {
@@ -45,6 +36,15 @@ routes.get(
     failureRedirect: "/login/failed",
   })
 );
+
+routes.get("/login/success", userController.loginGoogleSucces);
+
+routes.get("/login/failed", (req, res) => {
+  res.status(401).json({
+    error: true,
+    message: "Login failed",
+  });
+});
 
 routes.get("/logout", (req, res) => {
   req.logout((err) => {

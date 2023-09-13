@@ -5,6 +5,7 @@ import expressSession from "express-session";
 import cors from "cors";
 import passport from "passport";
 import cookieParser from "cookie-parser";
+import "./config/passport";
 
 export const app = express();
 
