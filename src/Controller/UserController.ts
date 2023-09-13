@@ -77,6 +77,7 @@ export class UserController {
           httpOnly: true,
           secure: true,
           path: "/",
+          domain: "https://api-sante.onrender.com",
         });
 
         res.redirect(process.env.FRONTEND_URL as string);
@@ -144,12 +145,11 @@ export class UserController {
           },
         });
       }
-      console.log(req.cookies);
       res.cookie("token", token, {
         httpOnly: true,
         secure: true,
         path: "/",
-        domain: ".onrender.com",
+        domain: "https://api-sante.onrender.com",
       });
 
       return res.status(200).json({
