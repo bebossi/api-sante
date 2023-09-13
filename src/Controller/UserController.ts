@@ -196,12 +196,6 @@ export class UserController {
         where: {
           id: userId,
         },
-        // include: {
-        //   cart: true,
-        //   addresses: true,
-        //   orders: true,
-
-        // },
         select: {
           password: false,
           email: true,
@@ -238,6 +232,22 @@ export class UserController {
       });
 
       return res.status(200).json(address);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+  }
+
+  async logout(req: Request, res: Response) {
+    try {
+      res.cookie("token", "", {
+        httpOnly: true,
+        secure: true,
+        path: "/",
+        sameSite: "none",
+      });
+
+      return res.status(200).json({ message: "Logged out successfully" });
     } catch (err) {
       console.log(err);
       return res.status(500).json(err);

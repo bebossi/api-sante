@@ -10,6 +10,7 @@ const userController = new UserController();
 
 routes.post("/signup", authMiddleware, userController.signUp);
 routes.post("/login", userController.login);
+routes.post("/logout", userController.logout);
 routes.put("/update", isAuth, authMiddleware, userController.updateUser);
 routes.get(
   "/currentUser",
