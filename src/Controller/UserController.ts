@@ -150,6 +150,7 @@ export class UserController {
         secure: true,
         path: "/",
         domain: "https://api-sante.onrender.com",
+        sameSite: "none",
       });
 
       return res.status(200).json({
