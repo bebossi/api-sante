@@ -75,7 +75,7 @@ export class UserController {
 
         res.cookie("token", token, {
           httpOnly: true,
-          // secure: true,
+          secure: true,
           path: "/",
         });
 
@@ -147,8 +147,8 @@ export class UserController {
       console.log(req.cookies);
       res.cookie("token", token, {
         httpOnly: true,
-        //   secure: true,
-        //   sameSite: "strict",
+        secure: true,
+        path: "/",
       });
 
       return res.status(200).json({
