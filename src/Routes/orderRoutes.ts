@@ -56,4 +56,7 @@ routes.put(
   orderController.statusOrder
 );
 
+routes.get("/totalRevenue", isAuth, isAdmin, orderController.getTotalRevenue);
+routes.get("/graphRevenue", isAuth, isAdmin, orderController.getGraphRevenue);
+
 export default routes;
