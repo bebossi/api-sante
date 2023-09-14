@@ -198,6 +198,7 @@ export class UserController {
           id: userId,
         },
         select: {
+          id: true,
           password: false,
           email: true,
           role: true,

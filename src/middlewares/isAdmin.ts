@@ -12,13 +12,18 @@ declare module "express" {
 
 export async function isAdmin(req: Request, res: Response, next: NextFunction) {
   try {
-    const { authorization } = req.headers;
+    // const { authorization } = req.headers;
 
-    if (!authorization) {
+    const token = req.cookies.token;
+
+    // if (!authorization) {
+    //   return res.sendStatus(403);
+    // }
+    if (!token) {
       return res.sendStatus(403);
     }
 
-    const token = authorization.replace("Bearer", "").trim();
+    // const token = authorization.replace("Bearer", "").trim();
     const secret = process.env.TOKEN_SIGN_SECRET as string;
 
     const data = jwt.verify(token, secret) as User;
