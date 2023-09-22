@@ -19,7 +19,7 @@ routes.get(
   userController.getCurrentUser
 );
 routes.post("/guestUser", userController.guestUser);
-routes.post("/address", userController.createAddress);
+routes.post("/address", authMiddleware, userController.createAddress);
 
 routes.get(
   "/google",

@@ -30,11 +30,7 @@ routes.post(
   isAdmin,
   appointmentController.createIsRestaurantOpen
 );
-routes.get(
-  "/getIsOpen",
-  authMiddleware,
-  appointmentController.isRestaurantOpen
-);
+routes.get("/getIsOpen", appointmentController.isRestaurantOpen);
 routes.put(
   "/updateIsOpen",
   isAuth,

@@ -25,12 +25,7 @@ routes.post(
 );
 routes.get("/getCategories", productController.getCategories);
 // routes.post("/category", productController.createCategory);
-routes.get(
-  "/getCategory/:categoryId",
-  isAuth,
-  isAdmin,
-  productController.getCategory
-);
+routes.get("/getCategory/:categoryId", productController.getCategory);
 routes.delete(
   "/deleteCategory",
   isAuth,

@@ -31,12 +31,13 @@ export class UserController {
         data: {
           email,
           password: hashedPassword,
+          role: "user",
         },
       });
 
-      const token = generateToken(newUser);
+      // const token = generateToken(newUser);
 
-      return res.status(200).json({ newUser, token });
+      return res.status(200).json(newUser);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -129,7 +130,7 @@ export class UserController {
       });
 
       if (!user) {
-        return res.status(401);
+        return res.status(401).json({ error: "User not found" });
       }
       const isValidPassword = bcrypt.compare(password, user.password!);
 
@@ -164,6 +165,7 @@ export class UserController {
       });
     } catch (err) {
       console.log(err);
+      return res.status(500).json(err);
     }
   }
 
@@ -203,7 +205,11 @@ export class UserController {
           email: true,
           role: true,
           addresses: true,
-          cart: true,
+          cart: {
+            include: {
+              cartProducts: true,
+            },
+          },
           name: true,
           orders: true,
         },
