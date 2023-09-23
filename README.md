@@ -14,20 +14,37 @@
 
 ## Introduction
 
-Santê is a restaurant located in Brazil. At Sante, we take pride in offering a delightful culinary experience featuring a delectable menu that includes açai, pasta, hotdogs, and an array of refreshing beverages. This README serves as a comprehensive guide to our restaurant project.
+Santê is a restaurant located in Belo Horizonte, Minas Gerais, Brazil. This website was developed to improve the range of the restaurant and to make it easier for customers to learn about the restaurant and its offerings.
+
+Customers can use the website to:
+
+View the restaurant's complete menu with toppings and prices
+Schedule an appointment to get their order
+Pay for their order securely and conveniently
 
 ## Installation
 
 ```bash
-Copy code
-git clone <repository_url>
+git clone https://github.com/bebossi/api-sante.git
+
 Navigate to the project directory:
+cd api-sante
 
-cd client-sante || cd api-sante
 Install dependencies for both the server and client:
-
 npm install
+
 Set up your database and configure the environment variables for authentication methods, social login, and other project-specific settings.
+add an .env file and set this keys:
+PORT_EXPRESS=
+DATABASE_URL=
+TOKEN_SIGN_SECRET=
+STRIPE_KEY=
+FRONTEND_URL=
+STRIPE_WEBHOOK=
+CLIENT_ID=
+CLIENT_SECRET=
+NODE_VERSION=
+
 npm run dev
 
 ```
@@ -36,23 +53,46 @@ npm run dev
 
 ### Authentication
 
-The project utilizes multiple authentication methods, including:
+The project uses multiple authentication methods to protect your data, including:
 
-### Cookies HttpOnly:
+#### Cookies (HttpOnly):
 
-Secure authentication using HttpOnly cookies for session management.
+Session management cookies that cannot be accessed by JavaScript, making them more secure.
 
-### JWT Tokens:
+#### JWT tokens:
 
-JSON Web Tokens are used for secure user authentication and authorization.
+Secure user authentication and authorization tokens that can be used to access protected resources.
 
 ### User Roles
 
-The system supports two user roles:
+#### The system supports three user roles:
 
 Admin Users: Have access to protected areas, including management of products, categories, orders, and toppings.
+
 Normal Users: Can interact with the menu, add products to the cart, and place orders.
-Admin Dashboard
+
+Guest: Created when a user visits the menu page without being logged in. Guests can interact with the cart and save their products to a database cart. When they log in or sign up, their cart is automatically updated with the products they saved.
+
+### Social Login
+
+Users can sign up or log in using social login with google.
+
+### Cart Functionality
+
+Users can interact with their cart, adding products, specifying quantities, and adding toppings if available.
+Cart information is stored securely in the database for each user.
+
+### Delivery Service
+
+This project supports delivery services. Orders placed within a 2-kilometer radius of the restaurant location are eligible for free delivery.
+Users can create a new address for themselves using the Google Maps API and Places Autocomplete library, or they can select an address that they have already created and saved in the database.
+
+### Appointment Booking
+
+This project supports appointment booking. Customers can reserve a specific time for their order pickup or delivery, ensuring that their meal is ready exactly when they need it.
+
+### Admin Dashboard
+
 Admin users have access to a dashboard with the following information:
 
 ### Monthly sales statistics.
@@ -62,28 +102,10 @@ Guest Users
 When normal users access the menu page without logging in, a guest user profile is created in the database.
 Guest users can interact with the menu and save their cart information in the database.
 
-### Social Login
-
-Users can sign up or log in using social login (e.g., OAuth) methods.
-Upon social login, the guest user profile is updated to a normal user with email and password, and their cart information is retained.
-
-### Cart Functionality
-
-Normal users can interact with their cart, adding products, specifying quantities, and adding toppings if available.
-Cart information is stored securely in the database for each user.
-
 ### End-to-End Testing
 
 End-to-end testing is performed using Cypress in the client to ensure the application functions as expected.
 Test scripts and procedures are provided for quality assurance.
-
-### Delivery Service
-
-We understand the importance of convenience for our customers. To enhance your dining experience, we offer a free delivery service for orders placed within a 2-kilometer radius of our restaurant location. This service ensures that your favorite Sante dishes can be enjoyed from the comfort of your home or office.
-
-### Appointment Booking
-
-At Sante, we believe in providing our customers with the utmost convenience. For those who prefer a planned dining experience, our appointment booking feature allows you to reserve a specific time for your order pickup or delivery. This ensures that your meal is ready exactly when you need it.
 
 ## License
 
