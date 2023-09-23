@@ -77,17 +77,17 @@ The following technologies were used to develop the Santê Restaurant website:
 
 The project uses multiple authentication methods to protect your data, including:
 
-#### Cookies (HttpOnly):
+- Cookies (HttpOnly):
 
 Session management cookies that cannot be accessed by JavaScript, making them more secure.
 
-#### JWT tokens:
+- JWT tokens:
 
 Secure user authentication and authorization tokens that can be used to access protected resources.
 
 ### User Roles
 
-#### The system supports three user roles:
+- The system supports three user roles:
 
 Admin Users: Have access to protected areas, including management of products, categories, orders, and toppings.
 
