@@ -51,6 +51,28 @@ npm run dev
 
 ## Features
 
+### Technologies
+
+The following technologies were used to develop the Santê Restaurant website:
+
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
+- Prisma
+- PostgreSQL Railway
+- Google Maps API
+- Stripe API
+- Passport
+- Express
+- CLoudinary
+- Axios
+- Lucide React
+- Shadcn-ui
+- Zustand
+- Zod
+- Cypress
+
 ### Authentication
 
 The project uses multiple authentication methods to protect your data, including:
