@@ -59,7 +59,7 @@ export class UserController {
           await prisma.user.create({
             data: {
               id: reqUser.id,
-              email: reqUser.email,
+              email: reqUser.emails[0].value,
               name: reqUser.displayName,
               role: "user",
             },

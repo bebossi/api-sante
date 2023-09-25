@@ -39,7 +39,7 @@ routes.get("/filterOrders", isAdmin, orderController.filterOrders);
 routes.get("/getOrder/:orderId", isAdmin, orderController.getOrder);
 routes.get(
   "/ordersByClient",
-  isAuth,
+  // isAuth,
   authMiddleware,
   orderController.getOrdersByClient
 );
