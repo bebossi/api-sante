@@ -34,7 +34,7 @@ routes.post(
   orderController.testingOrder
 );
 routes.get("/cart", authMiddleware, orderController.getCart);
-routes.get("/getOrders", isAdmin, orderController.getOrders);
+// routes.get("/getOrders", isAdmin, orderController.getOrders);
 routes.get("/filterOrders", isAdmin, orderController.filterOrders);
 routes.get("/getOrder/:orderId", isAdmin, orderController.getOrder);
 routes.get(

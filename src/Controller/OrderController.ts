@@ -513,27 +513,27 @@ export class OrderController {
     }
   }
 
-  async getOrders(req: Request, res: Response) {
-    try {
-      const orders = await prisma.order.findMany({
-        include: {
-          address: true,
-          orderProducts: true,
-          user: true,
-        },
-        orderBy: [
-          {
-            createdAt: "desc",
-          },
-        ],
-      });
+  // async getOrders(req: Request, res: Response) {
+  //   try {
+  //     const orders = await prisma.order.findMany({
+  //       include: {
+  //         address: true,
+  //         orderProducts: true,
+  //         user: true,
+  //       },
+  //       orderBy: [
+  //         {
+  //           createdAt: "desc",
+  //         },
+  //       ],
+  //     });
 
-      return res.status(200).json(orders);
-    } catch (err) {
-      console.log(err);
-      return res.status(400).json(err);
-    }
-  }
+  //     return res.status(200).json(orders);
+  //   } catch (err) {
+  //     console.log(err);
+  //     return res.status(400).json(err);
+  //   }
+  // }
 
   async filterOrders(req: Request, res: Response) {
     try {
@@ -637,7 +637,6 @@ export class OrderController {
       const filters: any = {
         userId: userId,
       };
-      // let query: any = {};
 
       if (isPaid) {
         filters.isPaid = isPaid === "true";
