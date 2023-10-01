@@ -32,7 +32,6 @@ routes.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     successRedirect: "/login/success",
-    // successRedirect: `${process.env.FRONTEND_URL}`,
     failureRedirect: "/login/failed",
   })
 );

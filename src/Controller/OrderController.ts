@@ -129,7 +129,7 @@ export class OrderController {
     }
   }
 
-  async removeProductt(req: Request, res: Response) {
+  async removeProduct(req: Request, res: Response) {
     try {
       const { productId, cartProductId } = req.body;
       const userId = req.currentUser?.id as string;
@@ -175,143 +175,6 @@ export class OrderController {
         },
         data: {
           subtotal: Number(cart?.subtotal) - cartToProduct.price,
-        },
-      });
-
-      return res.status(200).json(updatedCart);
-    } catch (err) {
-      console.log(err);
-      return res.status(400).json(err);
-    }
-  }
-
-  async removeProduct(req: Request, res: Response) {
-    try {
-      const { productId, toppings } = req.body;
-      const userId = req.currentUser?.id as string;
-
-      const removedProduct = await prisma.product.findUnique({
-        where: {
-          id: productId,
-        },
-        include: {
-          toppings: {
-            include: {
-              cartToProductToppings: true,
-            },
-          },
-        },
-      });
-
-      if (!removedProduct) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-
-      const cart = await prisma.cart.findUnique({
-        where: {
-          userId: userId,
-        },
-        include: {
-          cartProducts: true,
-        },
-      });
-
-      let existingProduct: CartToProduct | undefined;
-
-      existingProduct = cart?.cartProducts.find((item) => {
-        return item.productId === productId;
-      });
-
-      if (!existingProduct) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      let toppingsPrice = 0;
-
-      if (existingProduct && existingProduct?.quantity > 1) {
-        for (const topping of toppings) {
-          const selectedTopping = removedProduct.toppings.find((item) => {
-            return item.id === topping.id;
-          });
-          if (selectedTopping) {
-            const existingCartToProductTopping =
-              await prisma.cartToProductTopping.findMany({
-                where: {
-                  cartToProdId: existingProduct.id,
-                  toppingId: selectedTopping.id,
-                },
-              });
-
-            if (existingCartToProductTopping.length > 0) {
-              const cartToProductToppingToDelete =
-                existingCartToProductTopping[0];
-
-              await prisma.cartToProductTopping.delete({
-                where: {
-                  id: cartToProductToppingToDelete.id,
-                },
-              });
-
-              toppingsPrice += selectedTopping.price * Number(topping.quantity);
-            }
-          }
-        }
-
-        await prisma.cartToProduct.update({
-          where: {
-            id: existingProduct.id,
-            cartId: cart?.id,
-          },
-          data: {
-            quantity: existingProduct.quantity - 1,
-            price:
-              existingProduct.price -
-              Number(removedProduct.price) -
-              toppingsPrice,
-          },
-        });
-      } else {
-        await prisma.cartToProduct.delete({
-          where: {
-            id: existingProduct?.id,
-            cartId: cart?.id,
-          },
-        });
-      }
-
-      const updatedddCart = await prisma.cart.findUnique({
-        where: {
-          id: cart?.id,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              product: true,
-            },
-          },
-        },
-      });
-
-      const subtotal = updatedddCart?.cartProducts.reduce(
-        (total, cartProduct) => {
-          return total + Number(cartProduct.price);
-        },
-        0
-      );
-
-      const updatedCart = await prisma.cart.update({
-        where: {
-          id: cart?.id,
-        },
-        data: {
-          subtotal: subtotal,
-        },
-        include: {
-          cartProducts: {
-            include: {
-              product: true,
-              cartToProductToppings: true,
-            },
-          },
         },
       });
 
@@ -388,10 +251,10 @@ export class OrderController {
 
         const orderProduct = await prisma.orderToProduct.create({
           data: {
-            orderId: order.id,
-            productId: cartProduct.productId,
-            quantity: cartProduct.quantity,
-            price: cartProduct.price,
+            orderId: order.id as string,
+            productId: cartProduct.productId as string,
+            quantity: cartProduct.quantity as number,
+            price: cartProduct.price as number,
             orderToProductTopping: {
               create: toppings,
             },
@@ -459,10 +322,49 @@ export class OrderController {
       return res.status(201).json({ url: session.url });
     } catch (err) {
       console.log(err);
-      return res.status(400).json(err);
+      return res.status(400).json({
+        err,
+        message: "An error occurred while processing your order.",
+      });
     }
   }
 
+  async confirmOrder(req: Request, res: Response) {
+    const body = req.body;
+    const signature = req.headers["stripe-signature"] as string;
+    let event: Stripe.Event;
+
+    const payloadString = JSON.stringify(body);
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK! as string
+      );
+    } catch (err: any) {
+      console.log(err);
+      return res.status(400).json(`Web hook Error: ${err}`);
+    }
+
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    if (event.type === "checkout.session.completed") {
+      const order = await prisma.order.update({
+        where: {
+          id: session?.metadata?.orderId,
+        },
+        data: {
+          isPaid: true,
+          status: "Pagamento confirmado",
+        },
+        include: {
+          orderProducts: true,
+        },
+      });
+    }
+    return res.status(200).json({ recived: true });
+  }
   async getCart(req: Request, res: Response) {
     const userId = req.currentUser?.id;
 
@@ -512,28 +414,6 @@ export class OrderController {
       return res.status(400).json(err);
     }
   }
-
-  // async getOrders(req: Request, res: Response) {
-  //   try {
-  //     const orders = await prisma.order.findMany({
-  //       include: {
-  //         address: true,
-  //         orderProducts: true,
-  //         user: true,
-  //       },
-  //       orderBy: [
-  //         {
-  //           createdAt: "desc",
-  //         },
-  //       ],
-  //     });
-
-  //     return res.status(200).json(orders);
-  //   } catch (err) {
-  //     console.log(err);
-  //     return res.status(400).json(err);
-  //   }
-  // }
 
   async filterOrders(req: Request, res: Response) {
     try {
@@ -592,42 +472,6 @@ export class OrderController {
       console.log(err);
       return res.status(400).json(err);
     }
-  }
-
-  async confirmOrder(req: Request, res: Response) {
-    const body = req.body;
-    const signature = req.headers["stripe-signature"] as string;
-    let event: Stripe.Event;
-
-    const payloadString = JSON.stringify(body);
-    try {
-      event = stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK! as string
-      );
-    } catch (err: any) {
-      console.log(err);
-      return res.status(400).json(`Web hook Error: ${err}`);
-    }
-
-    const session = event.data.object as Stripe.Checkout.Session;
-
-    if (event.type === "checkout.session.completed") {
-      const order = await prisma.order.update({
-        where: {
-          id: session?.metadata?.orderId,
-        },
-        data: {
-          isPaid: true,
-          status: "Pagamento confirmado",
-        },
-        include: {
-          orderProducts: true,
-        },
-      });
-    }
-    return res.status(200).json({ recived: true });
   }
 
   async getOrdersByClient(req: Request, res: Response) {
@@ -729,12 +573,6 @@ export class OrderController {
       });
 
       const salesCount = paidOrders.length;
-      // const totalRevenue = paidOrders.reduce((total, order) => {
-      //   const orderTotal = order.orderProducts.reduce((orderSum, item) => {
-      //     return orderSum + item.product.price.toNumber();
-      //   }, 0);
-      //   return total + orderTotal;
-      // }, 0);
 
       const totalRevenue = paidOrders.reduce((total, order) => {
         return (total += order.subTotal);
@@ -764,16 +602,14 @@ export class OrderController {
 
       const monthlyRevenue: { [key: number]: number } = {};
 
-      // Grouping the orders by month and summing the revenue
       for (const order of paidOrders) {
-        const month = order.createdAt.getMonth(); // 0 for Jan, 1 for Feb, ...
+        const month = order.createdAt.getMonth();
         let revenueForOrder = 0;
 
         for (const product of order.orderProducts) {
           revenueForOrder += product.product.price.toNumber();
         }
 
-        // Adding the revenue for this order to the respective month
         monthlyRevenue[month] = (monthlyRevenue[month] || 0) + revenueForOrder;
       }
 
@@ -781,7 +617,6 @@ export class OrderController {
         name: string;
         total: number;
       }
-      // Converting the grouped data into the format expected by the graph
       const graphData: GraphData[] = [
         { name: "Jan", total: 0 },
         { name: "Feb", total: 0 },
@@ -797,7 +632,6 @@ export class OrderController {
         { name: "Dec", total: 0 },
       ];
 
-      // Filling in the revenue data
       for (const month in monthlyRevenue) {
         graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)];
       }
