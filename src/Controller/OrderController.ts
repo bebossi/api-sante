@@ -9,7 +9,7 @@ export class OrderController {
   async addProduct(req: Request, res: Response) {
     try {
       const { productId, toppings, quantity } = req.body;
-      const userId = req.currentUser?.id;
+      const userId = req.currentUser?.id as string;
 
       const cart = await prisma.cart.findUnique({
         where: {
@@ -45,9 +45,9 @@ export class OrderController {
       const cartToProduct = await prisma.cartToProduct.create({
         data: {
           cartId: cart?.id as string,
-          productId: productId,
-          quantity: quantity,
-          price: Number(addProduct?.price),
+          productId: productId as string,
+          quantity: quantity as number,
+          price: Number(addProduct?.price) as number,
         },
       });
 
