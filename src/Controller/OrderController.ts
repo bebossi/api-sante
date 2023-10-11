@@ -1,11 +1,163 @@
-import { CartToProduct, Order, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import Stripe from "stripe";
 import { stripe } from "../libs/stripe";
+import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
+import { Address, Items } from "mercadopago/dist/clients/commonTypes";
 
 const prisma = new PrismaClient();
 
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN as string,
+});
+const preference = new Preference(client);
+
 export class OrderController {
+  async testMercadoPago(req: Request, res: Response) {
+    try {
+      const userId = req.currentUser?.id;
+      const { addressId, avaliableAppointmentId } = req.body;
+
+      const cart = await prisma.cart.findUnique({
+        where: {
+          userId: userId,
+        },
+        include: {
+          cartProducts: {
+            include: {
+              product: true,
+              cartToProductToppings: true,
+            },
+          },
+        },
+      });
+
+      if (
+        (avaliableAppointmentId && addressId) ||
+        (!avaliableAppointmentId && !addressId)
+      ) {
+        return res.status(500).json("error");
+      }
+
+      const order = await prisma.order.create({
+        data: {
+          avaliableAppointmentId: avaliableAppointmentId || undefined,
+          addressId: addressId || undefined,
+          userId: userId as string,
+          subTotal: Number(cart?.subtotal),
+          total: 0,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      for (const cartProduct of cart?.cartProducts || []) {
+        const toppings = cartProduct.cartToProductToppings.map((topping) => ({
+          toppingId: topping.toppingId,
+          quantity: topping.quantity,
+        }));
+
+        const orderProduct = await prisma.orderToProduct.create({
+          data: {
+            orderId: order.id as string,
+            productId: cartProduct.productId as string,
+            quantity: cartProduct.quantity as number,
+            price: cartProduct.price as number,
+            orderToProductTopping: {
+              create: toppings,
+            },
+          },
+        });
+      }
+
+      const actualOrder = await prisma.order.findUnique({
+        where: {
+          id: order.id,
+        },
+        include: {
+          address: true,
+          orderProducts: {
+            include: {
+              product: true,
+              orderToProductTopping: true,
+            },
+          },
+        },
+      });
+
+      const address = {
+        zip_code: actualOrder?.address?.CEP,
+        street_name: actualOrder?.address?.street,
+        street_number: actualOrder?.address?.streetNumber,
+      };
+
+      const items = actualOrder?.orderProducts.map((orderProduct) => {
+        return {
+          id: orderProduct.productId as string,
+          title: orderProduct.product.name as string,
+          description: orderProduct.product.description as string,
+          picture_url: orderProduct.product.image as string,
+          category_id: orderProduct.product.categoryId as string,
+          quantity: orderProduct.quantity as number,
+          unit_price: orderProduct.product.price.toNumber() as number,
+          currency_id: "BRL",
+        };
+      });
+
+      preference.create({
+        body: {
+          items: items!,
+          payer: {
+            email: order.user.email as string,
+            name: order.user.name as string,
+            address: address as Address,
+          },
+          back_urls: {
+            success: process.env.FRONTEND_URL,
+            failure: process.env.FRONTEND_URL,
+            pending: process.env.FRONTEND_URL,
+          },
+          redirect_urls: {
+            success: `${process.env.FRONTEND_URL}/success`,
+            failure: `${process.env.FRONTEND_URL}/failure`,
+            pending: `${process.env.FRONTEND_URL}/pending`,
+          },
+          auto_return: "approved",
+          notification_url: process.env.FRONTEND_URL,
+          payment_methods: {
+            excluded_payment_methods: [
+              {
+                id: "bolbradesco",
+              },
+              {
+                id: "pec",
+              },
+            ],
+          },
+        },
+      });
+
+      await prisma.cart.update({
+        where: {
+          id: cart?.id,
+        },
+        data: {
+          subtotal: 0,
+        },
+      });
+
+      await prisma.cartToProduct.deleteMany({
+        where: {
+          cartId: cart?.id,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
   async addProduct(req: Request, res: Response) {
     try {
       const { productId, toppings, quantity } = req.body;
