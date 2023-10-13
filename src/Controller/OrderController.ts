@@ -58,7 +58,7 @@ export class OrderController {
           quantity: topping.quantity,
         }));
 
-        const orderProduct = await prisma.orderToProduct.create({
+        await prisma.orderToProduct.create({
           data: {
             orderId: order.id as string,
             productId: cartProduct.productId as string,
@@ -104,8 +104,9 @@ export class OrderController {
           currency_id: "BRL",
         };
       });
+      console.log(items);
 
-      preference.create({
+      let data = await preference.create({
         body: {
           items: items!,
           payer: {
@@ -152,6 +153,8 @@ export class OrderController {
           cartId: cart?.id,
         },
       });
+
+      res.redirect(data.init_point as string);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);

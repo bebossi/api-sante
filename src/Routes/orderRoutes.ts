@@ -7,7 +7,11 @@ import { OrderController } from "../Controller/OrderController";
 const routes = Router();
 const orderController = new OrderController();
 
-routes.post("/testMercadoPago", orderController.testMercadoPago);
+routes.post(
+  "/testMercadoPago",
+  authMiddleware,
+  orderController.testMercadoPago
+);
 
 routes.post("/addProduct", isAuth, authMiddleware, orderController.addProduct);
 routes.delete(
