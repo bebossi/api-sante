@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import Stripe from "stripe";
 import { stripe } from "../libs/stripe";
-import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
-import { Address, Items } from "mercadopago/dist/clients/commonTypes";
+import { MercadoPagoConfig, Preference } from "mercadopago";
+import { Address } from "mercadopago/dist/clients/commonTypes";
 
 const prisma = new PrismaClient();
 
@@ -104,7 +104,7 @@ export class OrderController {
           currency_id: "BRL",
         };
       });
-      console.log(items);
+      // console.log("items", items);
 
       let data = await preference.create({
         body: {
@@ -120,9 +120,9 @@ export class OrderController {
             pending: process.env.FRONTEND_URL,
           },
           redirect_urls: {
-            success: `${process.env.FRONTEND_URL}/success`,
-            failure: `${process.env.FRONTEND_URL}/failure`,
-            pending: `${process.env.FRONTEND_URL}/pending`,
+            success: `http://localhost:8080/feedback`,
+            failure: `http://localhost:8080/feedback`,
+            pending: `http://localhost:8080/feedback`,
           },
           auto_return: "approved",
           notification_url: process.env.FRONTEND_URL,
@@ -138,6 +138,7 @@ export class OrderController {
           },
         },
       });
+      // console.log("data", data);
 
       await prisma.cart.update({
         where: {
@@ -154,7 +155,21 @@ export class OrderController {
         },
       });
 
-      res.redirect(data.init_point as string);
+      return res.status(201).json({ actualOrder, data });
+      // res.redirect(data.init_point as string);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async feedback(req: Request, res: Response) {
+    try {
+      res.json({
+        Payment: req.query.payment_id,
+        Status: req.query.status,
+        MerchantOrder: req.query.merchant_order_id,
+      });
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);

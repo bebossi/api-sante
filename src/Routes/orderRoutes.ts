@@ -12,6 +12,7 @@ routes.post(
   authMiddleware,
   orderController.testMercadoPago
 );
+routes.get("/feedback", orderController.feedback);
 
 routes.post("/addProduct", isAuth, authMiddleware, orderController.addProduct);
 routes.delete(
