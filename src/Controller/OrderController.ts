@@ -114,27 +114,26 @@ export class OrderController {
             name: order.user.name as string,
             address: address as Address,
           },
+          // back_urls: {
+          //   success: process.env.FRONTEND_URL,
+          //   failure: process.env.FRONTEND_URL,
+          //   pending: process.env.FRONTEND_URL,
+          // },
           back_urls: {
-            success: process.env.FRONTEND_URL,
-            failure: process.env.FRONTEND_URL,
-            pending: process.env.FRONTEND_URL,
+            success: `http://localhost:4121/feedback`,
+            failure: `http://localhost:4121/feedback`,
+            pending: `http://localhost:4121/feedback`,
           },
-          redirect_urls: {
-            success: `http://localhost:8080/feedback`,
-            failure: `http://localhost:8080/feedback`,
-            pending: `http://localhost:8080/feedback`,
-          },
+
+          // redirect_urls: {
+          //   success: `http://localhost:8080/feedback`,
+          //   failure: `http://localhost:8080/feedback`,
+          //   pending: `http://localhost:8080/feedback`,
+          // },
           auto_return: "approved",
-          notification_url: process.env.FRONTEND_URL,
+          // notification_url: process.env.FRONTEND_URL,
           payment_methods: {
-            excluded_payment_methods: [
-              {
-                id: "bolbradesco",
-              },
-              {
-                id: "pec",
-              },
-            ],
+            installments: 1,
           },
         },
       });
@@ -165,6 +164,9 @@ export class OrderController {
 
   async feedback(req: Request, res: Response) {
     try {
+      console.log("req query", req.query);
+      console.log("res json", res.json);
+
       res.json({
         Payment: req.query.payment_id,
         Status: req.query.status,
