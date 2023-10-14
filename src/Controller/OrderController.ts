@@ -2,8 +2,13 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import Stripe from "stripe";
 import { stripe } from "../libs/stripe";
-import { MercadoPagoConfig, Preference } from "mercadopago";
+import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
 import { Address } from "mercadopago/dist/clients/commonTypes";
+import {
+  PaymentGetClient,
+  PaymentGetData,
+} from "mercadopago/dist/clients/payment/get/types";
+import { ParsedQs } from "qs";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +16,7 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN as string,
 });
 const preference = new Preference(client);
+const payment = new Payment(client);
 
 export class OrderController {
   async testMercadoPago(req: Request, res: Response) {
@@ -156,6 +162,23 @@ export class OrderController {
 
       return res.status(201).json({ actualOrder, data });
       // res.redirect(data.init_point as string);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json(err);
+    }
+  }
+
+  async webHook(req: Request, res: Response) {
+    try {
+      const paymentQuery = req.query;
+
+      if (paymentQuery.type === "payment") {
+        // let data = await payment.findById(Number(payment["data.id"]));
+        let data = await payment.get({ id: paymentQuery.id as string });
+        console.log(data);
+      }
+
+      res.sendStatus(204);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
