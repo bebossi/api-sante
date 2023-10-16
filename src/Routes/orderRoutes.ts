@@ -13,6 +13,7 @@ routes.post(
   orderController.testMercadoPago
 );
 routes.get("/feedback", orderController.feedback);
+routes.post("/webhook", orderController.webHook);
 
 routes.post("/addProduct", isAuth, authMiddleware, orderController.addProduct);
 routes.delete(
@@ -21,7 +22,7 @@ routes.delete(
   authMiddleware,
   orderController.removeProduct
 );
-routes.post("/webhook", orderController.confirmOrder);
+// routes.post("/webhook", orderController.confirmOrder); stripe
 routes.post("/testCheckout", authMiddleware, orderController.testingOrder);
 routes.put("/removeAll", authMiddleware, orderController.removeAll);
 routes.get("/cart", authMiddleware, orderController.getCart);
