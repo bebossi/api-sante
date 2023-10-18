@@ -4,16 +4,12 @@ import Stripe from "stripe";
 import { stripe } from "../libs/stripe";
 import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
 import { Address } from "mercadopago/dist/clients/commonTypes";
-import {
-  PaymentGetClient,
-  PaymentGetData,
-} from "mercadopago/dist/clients/payment/get/types";
-import { ParsedQs } from "qs";
 
 const prisma = new PrismaClient();
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN as string,
+  options: { timeout: 10000 },
 });
 const preference = new Preference(client);
 const payment = new Payment(client);
@@ -126,8 +122,8 @@ export class OrderController {
           //   pending: process.env.FRONTEND_URL,
           // },
           back_urls: {
-            success: `http://localhost:4121/feedback`,
-            // success: process.env.FRONTEND_URL,
+            // success: `http://localhost:4121/feedback`,
+            success: process.env.FRONTEND_URL,
             failure: `http://localhost:4121/feedback`,
             pending: `http://localhost:4121/feedback`,
           },
@@ -138,14 +134,13 @@ export class OrderController {
           //   pending: `http://localhost:8080/feedback`,
           // },
           auto_return: "approved",
-          // notification_url: process.env.FRONTEND_URL,
           notification_url: "https://dc82-80-233-54-121.ngrok-free.app/webhook",
           payment_methods: {
             installments: 1,
           },
         },
       });
-      console.log("data", data);
+      // console.log("data", data);
 
       await prisma.cart.update({
         where: {
@@ -163,7 +158,6 @@ export class OrderController {
       });
 
       return res.status(201).json({ actualOrder, data });
-      // res.redirect(data.init_point as string);
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -173,17 +167,15 @@ export class OrderController {
   async webHook(req: Request, res: Response) {
     try {
       const paymentQuery = req.query;
-      console.log("req query webhook ", paymentQuery["data.id"]);
+      console.log("req body webhook", req.body);
 
       if (paymentQuery.type === "payment") {
-        console.log("payment query", paymentQuery);
-        // let data = await payment.get({ id: paymentQuery.id as string });
-        let data = await payment.get(paymentQuery["data.id"] as any);
-
+        console.log("payment query payment", paymentQuery);
+        let data = await payment.get({ id: paymentQuery.id as string });
         console.log("data webhook", data);
       }
 
-      res.sendStatus(204);
+      return res.status(200).json({ message: "ok" });
     } catch (err) {
       console.log(err);
       return res.status(400).json(err);
@@ -192,11 +184,11 @@ export class OrderController {
 
   async feedback(req: Request, res: Response) {
     try {
-      console.log("req query feedback", req.query);
-      const paymentId = req.query.payment_id;
-      console.log("paymentId feedback", paymentId);
-      const paymentQuery = await payment.get(paymentId as any);
-      console.log("payment query feedback", paymentQuery);
+      // console.log("req query feedback", req.query);
+      // const paymentId = req.query.payment_id;
+      // console.log("paymentId feedback", paymentId);
+      // const paymentQuery = await payment.get(paymentId as any);
+      // console.log("payment query feedback", paymentQuery);
       res.json({
         Payment: req.query.payment_id,
         Status: req.query.status,
