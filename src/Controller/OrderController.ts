@@ -110,6 +110,10 @@ export class OrderController {
 
       let data = await preference.create({
         body: {
+          metadata: {
+            orderId: order?.id,
+            userId: order?.user.id,
+          },
           items: items!,
           payer: {
             email: order.user.email as string,
@@ -134,7 +138,8 @@ export class OrderController {
           //   pending: `http://localhost:8080/feedback`,
           // },
           auto_return: "approved",
-          notification_url: "https://dc82-80-233-54-121.ngrok-free.app/webhook",
+          notification_url: "https://0383-80-233-42-20.ngrok-free.app/webhook",
+
           payment_methods: {
             installments: 1,
           },
@@ -167,12 +172,20 @@ export class OrderController {
   async webHook(req: Request, res: Response) {
     try {
       const paymentQuery = req.query;
-      console.log("req body webhook", req.body);
+      const paymentBody = req.body;
+      // console.log("req body webhook", req.body);
 
-      if (paymentQuery.type === "payment") {
-        console.log("payment query payment", paymentQuery);
-        let data = await payment.get({ id: paymentQuery.id as string });
-        console.log("data webhook", data);
+      if (
+        paymentBody.type === "payment" &&
+        paymentBody.action === "payment.created"
+      ) {
+        let search = await payment.search({
+          options: { limit: 5, sort: "date_approved", criteria: "desc" },
+        });
+        console.log("search", search);
+
+        // let data = await payment.get({ id: paymentQuery.id as string });
+        // console.log("data webhook", data);
       }
 
       return res.status(200).json({ message: "ok" });

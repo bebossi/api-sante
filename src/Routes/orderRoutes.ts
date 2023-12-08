@@ -14,7 +14,6 @@ routes.post(
 );
 routes.get("/feedback", orderController.feedback);
 routes.post("/webhook", orderController.webHook);
-// routes.get("/webhook", orderController.webHook);
 
 routes.post("/addProduct", isAuth, authMiddleware, orderController.addProduct);
 routes.delete(
