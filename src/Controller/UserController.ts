@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
-import { Request, Response } from "express";
-import { generateToken } from "../config/jwt.config";
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
+import { generateToken } from '../config/jwt.config';
 
 const prisma = new PrismaClient();
 
@@ -21,8 +21,16 @@ export class UserController {
           data: {
             email,
             password: hashedPassword,
-            role: "user",
+            role: 'user',
           },
+        });
+        const token = generateToken(user);
+
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: true,
+          path: '/',
+          sameSite: 'none',
         });
         return res.status(200).json(user);
       }
@@ -31,12 +39,17 @@ export class UserController {
         data: {
           email,
           password: hashedPassword,
-          role: "user",
+          role: 'user',
         },
       });
 
-      // const token = generateToken(newUser);
-
+      const token = generateToken(newUser);
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        path: '/',
+        sameSite: 'none',
+      });
       return res.status(200).json(newUser);
     } catch (err) {
       console.log(err);
@@ -61,7 +74,7 @@ export class UserController {
               id: reqUser.id,
               email: reqUser.emails[0].value,
               name: reqUser.displayName,
-              role: "user",
+              role: 'user',
             },
           });
         }
@@ -74,18 +87,18 @@ export class UserController {
 
         const token = generateToken(createdUser!);
 
-        res.cookie("token", token, {
+        res.cookie('token', token, {
           httpOnly: true,
           secure: true,
-          path: "/",
-          sameSite: "none",
+          path: '/',
+          sameSite: 'none',
         });
 
         res.redirect(process.env.FRONTEND_URL as string);
       } else {
         res.status(403).json({
           error: true,
-          message: "Not authorized",
+          message: 'Not authorized',
         });
       }
     } catch (err) {
@@ -98,19 +111,25 @@ export class UserController {
     try {
       const guestUser = await prisma.user.create({
         data: {
-          role: "guest",
+          role: 'guest',
         },
       });
 
       const token = generateToken(guestUser);
 
-      const guestCart = await prisma.cart.create({
+      await prisma.cart.create({
         data: {
           userId: guestUser.id,
           subtotal: 0,
         },
       });
 
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        path: '/',
+        sameSite: 'none',
+      });
       return res.status(200).json({ guestUser, token });
     } catch (err) {
       console.log(err);
@@ -129,7 +148,7 @@ export class UserController {
       });
 
       if (!user) {
-        return res.status(401).json({ error: "User not found" });
+        return res.status(401).json({ error: 'User not found' });
       }
       const isValidPassword = bcrypt.compare(password, user.password!);
 
@@ -146,11 +165,11 @@ export class UserController {
           },
         });
       }
-      res.cookie("token", token, {
+      res.cookie('token', token, {
         httpOnly: true,
         secure: true,
-        path: "/",
-        sameSite: "none",
+        path: '/',
+        sameSite: 'none',
       });
 
       return res.status(200).json({
@@ -246,14 +265,14 @@ export class UserController {
 
   async logout(req: Request, res: Response) {
     try {
-      res.cookie("token", "", {
+      res.cookie('token', '', {
         httpOnly: true,
         secure: true,
-        path: "/",
-        sameSite: "none",
+        path: '/',
+        sameSite: 'none',
       });
 
-      return res.status(200).json({ message: "Logged out successfully" });
+      return res.status(200).json({ message: 'Logged out successfully' });
     } catch (err) {
       console.log(err);
       return res.status(500).json(err);
