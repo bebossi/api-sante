@@ -11,157 +11,113 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String?   @unique
-  name      String?
-  password  String?
-  addresses Address[]
-  cart      Cart?
-  orders    Order[]
-  role      String    @default("user")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(uuid())
+  email      String?   @unique
+  name       String?
+  password   String?
+  addresses  Address[]
+  orders     Order[]
+  role       String    @default("user")
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 }
 
 model Address {
-  id               String  @id @default(uuid())
-  street           String
-  neighborhood     String
-  streetNumber     Int
-  complementNumber Int?
-  CEP              Int
-  userId           String
-  user             User    @relation(fields: [userId], references: [id])
-  order            Order[]
+  id                String  @id @default(uuid())
+  street            String
+  neighborhood      String
+  street_number     Int
+  complement_number Int?
+  CEP               Int
+  user_id           String
+  user              User    @relation(fields: [user_id], references: [id])
+  orders            Order[]
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   products Product[]
 }
 
 model Product {
-  id            String           @id @default(uuid())
-  name          String
-  description   String
-  price         Decimal
-  image         String
-  categoryId    String
-  category      Category         @relation(fields: [categoryId], references: [id])
-  cartProducts  CartToProduct[]
-  orderProducts OrderToProduct[]
-  toppings      Topping[]
+  id          String      @id @default(uuid())
+  name        String
+  description String
+  price       Decimal
+  image       String
+  category_id String
+  category    Category    @relation(fields: [category_id], references: [id])
+  order_items OrderItem[]
+  toppings    Topping[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Topping {
-  id                     String                  @id @default(uuid())
-  name                   String
-  description            String
-  price                  Int
-  image                  String
-  productId              String
-  product                Product                 @relation(fields: [productId], references: [id])
-  cartToProductToppings  CartToProductTopping[]
-  orderToProductToppings OrderToProductTopping[]
-}
-
-model CartToProductTopping {
-  id           String @id @default(uuid())
-  cartToProdId String
-  toppingId    String
-  quantity     Int
-
-  cartToProduct CartToProduct @relation(fields: [cartToProdId], references: [id], onDelete: Cascade)
-  topping       Topping       @relation(fields: [toppingId], references: [id])
-}
-
-model OrderToProductTopping {
-  id               String @id @default(uuid())
-  orderToProductId String
-  toppingId        String
-  quantity         Int
-
-  orderToProduct OrderToProduct @relation(fields: [orderToProductId], references: [id], onDelete: Cascade)
-  topping        Topping        @relation(fields: [toppingId], references: [id])
+  id                  String             @id @default(uuid())
+  name                String
+  description         String
+  price               Int
+  image               String
+  product_id          String
+  product             Product            @relation(fields: [product_id], references: [id])
+  order_item_toppings OrderItemTopping[]
 }
 
 model Order {
-  id                     String           @id @default(uuid())
-  userId                 String
-  orderProducts          OrderToProduct[]
-  subTotal               Int
-  total                  Int
-  createdAt              DateTime         @default(now())
-  addressId              String?
-  isPaid                 Boolean          @default(false)
-  avaliableAppointmentId String?
-  status                 String           @default("Confirmando pagamento")
+  id                       String      @id @default(uuid())
+  user_id                  String
+  order_items              OrderItem[]
+  subTotal                 Decimal
+  total                    Decimal
+  created_at               DateTime    @default(now())
+  address_id               String?
+  isPaid                   Boolean     @default(false)
+  avaliable_appointment_id String?
+  status                   String      @default("Confirmando pagamento")
 
-  avaliableAppointment AvailableAppointment? @relation(fields: [avaliableAppointmentId], references: [id])
-  address              Address?              @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  user                 User                  @relation(fields: [userId], references: [id])
+  avaliable_appointment AvailableAppointment? @relation(fields: [avaliable_appointment_id], references: [id])
+  address               Address?              @relation(fields: [address_id], references: [id], onDelete: Cascade)
+  user                  User                  @relation(fields: [user_id], references: [id])
 }
 
-model Cart {
-  id           String          @id @default(uuid())
-  userId       String?         @unique
-  cartProducts CartToProduct[]
-  subtotal     Int
-  sessionId    String?         @unique
+model OrderItemTopping {
+  id            String @id @default(uuid())
+  order_item_id String
+  topping_id    String
+  quantity      Int
 
-  user    User?    @relation(fields: [userId], references: [id])
-  session Session? @relation(fields: [sessionId], references: [id])
+  order_item OrderItem @relation(fields: [order_item_id], references: [id], onDelete: Cascade)
+  topping    Topping   @relation(fields: [topping_id], references: [id])
 }
 
-model Session {
-  id        String   @id @default(uuid())
-  sid       String   @unique
-  data      String?
-  expiresAt DateTime
-  cart      Cart?
-}
+model OrderItem {
+  id                  String             @id @default(uuid())
+  order_id            String
+  product_id          String
+  quantity            Int
+  price               Int
+  order_item_toppings OrderItemTopping[]
 
-model CartToProduct {
-  id                    String                 @id @default(uuid())
-  cartId                String
-  productId             String
-  quantity              Int
-  price                 Int
-  cartToProductToppings CartToProductTopping[]
-
-  product Product @relation(fields: [productId], references: [id])
-  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-}
-
-model OrderToProduct {
-  id                    String                  @id @default(uuid())
-  orderId               String
-  productId             String
-  quantity              Int
-  price                 Int
-  orderToProductTopping OrderToProductTopping[]
-
-  product Product @relation(fields: [productId], references: [id])
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id])
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }
 
 model AvailableAppointment {
   id          String   @id @default(uuid())
-  startDate   DateTime
-  endTime     String
+  start_date  DateTime
+  end_date    String
   isAvailable Boolean
   orders      Order[]
 }
 
 model isRestaurantOpen {
-  id          String   @id @default(uuid())
-  isOpen      Boolean
-  updatedDate DateTime
+  id           String   @id @default(uuid())
+  is_open      Boolean
+  updated_date DateTime
 }
