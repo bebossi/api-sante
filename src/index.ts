@@ -1,15 +1,15 @@
-import express from "express";
-import "dotenv/config";
-import routes from "./Routes";
-import expressSession from "express-session";
-import cors from "cors";
-import passport from "passport";
-import cookieParser from "cookie-parser";
-import "./config/passport";
+import express from 'express'
+import 'dotenv/config'
+import routes from './Routes'
+import expressSession from 'express-session'
+import cors from 'cors'
+import passport from 'passport'
+import cookieParser from 'cookie-parser'
+import './@config/passport'
 
-export const app = express();
+export const app = express()
 
-app.set("trust proxy", 1);
+app.set('trust proxy', 1)
 
 app.use(
   expressSession({
@@ -17,35 +17,31 @@ app.use(
     resave: true,
     saveUninitialized: true,
   })
-);
+)
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(
-  (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ): void => {
-    if (req.originalUrl === "/webhook") {
-      express.raw({ type: "application/json" });
-      next();
+  (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+    if (req.originalUrl === '/webhook') {
+      express.raw({ type: 'application/json' })
+      next()
     } else {
-      express.json()(req, res, next);
+      express.json()(req, res, next)
     }
   }
-);
+)
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
   })
-);
-app.use(express.raw({ type: "application/json" }));
-app.use(cookieParser());
+)
+app.use(express.raw({ type: 'application/json' }))
+app.use(cookieParser())
 
-app.use(routes);
+app.use(routes)
 app.listen(process.env.PORT_EXPRESS, () => {
-  console.log("Server listening on port", process.env.PORT_EXPRESS);
-});
+  console.log('Server listening on port', process.env.PORT_EXPRESS)
+})
