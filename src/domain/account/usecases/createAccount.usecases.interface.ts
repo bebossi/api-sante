@@ -1,9 +1,9 @@
-export interface CreateUserUseCaseInput {
+export interface CreateAccountUsecaseInput {
   name: string
   email: string
   password: string
 }
 
 export interface ICreateAccountUsecases {
-  execute(input: CreateUserUseCaseInput): Promise<void>
+  execute(input: CreateAccountUsecaseInput): Promise<void>
 }
