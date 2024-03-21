@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 
 class Encrypt {
   public static async encryptPassword(password: string): Promise<string> {
-    const encryptedPassword = await bcrypt.hash(password, process.env.ENCRYPTION_SALT!)
+    const encryptedPassword = await bcrypt.hash(password, 20)
 
     return encryptedPassword
   }
