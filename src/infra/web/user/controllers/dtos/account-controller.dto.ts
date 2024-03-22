@@ -7,3 +7,10 @@ export interface CreateUserRequest {
 export interface RegisterResponse {
   message: string
 }
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export type LoginResponse = { token: string } | { message: string }
