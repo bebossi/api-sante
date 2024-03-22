@@ -1,7 +1,8 @@
-import { Encrypt } from '../../../domain/@shared/utils/encrypt'
-import { User } from '../../../domain/user/entity/user'
-import { EmailAlreadyInUseError } from '../../../domain/user/errors/email-already-in-use-error'
-import { IUserRepository } from '../../../domain/user/repository/user.repository.interface'
+import { injectable, inject } from 'tsyringe'
+import { Encrypt } from '../../../../domain/@shared/utils/encrypt'
+import { User } from '../../../../domain/user/entity/user'
+import { EmailAlreadyInUseError } from '../../../../domain/user/errors/email-already-in-use-error'
+import { IUserRepository } from '../../../../domain/user/repository/user.repository.interface'
 
 export interface CreateUserUsecaseInput {
   name: string
@@ -14,8 +15,12 @@ export interface ICreateUserUsecases {
   execute(input: CreateUserUsecaseInput): Promise<void>
 }
 
+@injectable()
 export class CreateUserUsecase implements ICreateUserUsecases {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    @inject('IUserRepository')
+    private userRepository: IUserRepository
+  ) {}
   async execute(input: CreateUserUsecaseInput): Promise<void> {
     const { name, email, password, role } = input
 
