@@ -1,6 +1,9 @@
 import { prisma } from '../../../../@config/prisma'
 import { User } from '../../../../domain/user/entity/user'
-import { IUserRepository } from '../../../../domain/user/repository/user.repository.interface'
+import {
+  IUserRepository,
+  LoginInput,
+} from '../../../../domain/user/repository/user.repository.interface'
 import { UserMapper } from './mappers/user-mapper'
 
 export class UserRepository implements IUserRepository {
@@ -24,5 +27,16 @@ export class UserRepository implements IUserRepository {
     if (!user) return null
 
     return UserMapper.toEntity(user)
+  }
+
+  async login({ email, password }: LoginInput): Promise<boolean> {
+    const user = await prisma.user.findFirst({
+      where: {
+        AND: [{ email }, { password }],
+      },
+    })
+    console.log(user)
+    if (user) return true
+    return false
   }
 }
