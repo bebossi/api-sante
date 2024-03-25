@@ -1,4 +1,4 @@
-import { Order } from '../../order/entity/order'
+import { Order } from 'domain/order/entity/order'
 import UserValidatorFactory from '../factories/validators/user-validator.factory'
 import { UserId } from '../value-objects/user-id'
 import Address from './address'
@@ -16,22 +16,25 @@ export type UserProps = {
 }
 
 export type UserConstructorProps = {
-  id?: UserId
+  id?: UserId | string
   name: string
   email: string
   password: string
   role: string
-  // addressess: Address[]
-  // orders: Order[]
   createdAt?: Date
   updatedAt?: Date
+  // addressess: Address[]
+  // orders: Order[]
 }
 
 class User {
   _props: UserProps = {} as UserProps
+  private _id: UserId
   constructor(props: UserConstructorProps) {
     this._props.id =
       typeof props.id === 'string' ? new UserId(props.id) : props.id ?? new UserId()
+
+    this._id = this._props.id
 
     this._props.name = props.name
     this._props.email = props.email
