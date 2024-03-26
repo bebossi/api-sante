@@ -12,11 +12,10 @@ describe('LoginUseCase unit tests', () => {
   beforeEach(async () => {
     usersRepository = new FakeUsersRepository()
     loginUsecase = new LoginUseCase(usersRepository)
-    const encryptedPassword = await Encrypt.encryptPassword('test')
     const user = User.create({
       name: 'bernardo',
       email: 'be@gmail.com',
-      password: encryptedPassword,
+      password: await Encrypt.encryptPassword('test'),
       role: 'admin',
     })
     await usersRepository.create(user)
