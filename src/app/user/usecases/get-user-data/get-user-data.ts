@@ -1,3 +1,5 @@
+import { Order } from '@domain/order/entity/order'
+import Address from '@domain/user/entity/address'
 import { UserNotFoundError } from '@domain/user/errors/user-not-found-error'
 import { IUserRepository } from '@domain/user/repository/user.repository.interface'
 import { inject, injectable } from 'tsyringe'
@@ -11,6 +13,8 @@ interface GetUserDataOutput {
   email: string
   name: string
   role: string
+  orders: Order[]
+  addressess: Address[]
   createdAt: string
   updatedAt: string
 }
