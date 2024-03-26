@@ -38,12 +38,14 @@ class LoginUseCase {
       password,
     })
 
-    const token = jwt.sign({}, process.env.TOKEN_SIGN_SECRET as string, {
-      expiresIn: '24h',
-      subject: user.id.value,
-    })
-    console.log('usecase', token)
-
+    const token = jwt.sign(
+      {},
+      process.env.TOKEN_SIGN_SECRET || ('iewjfbhewkjfbewjhb' as string),
+      {
+        expiresIn: '24h',
+        subject: user.id.value,
+      }
+    )
     return { token: token }
   }
 }
