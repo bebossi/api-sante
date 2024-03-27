@@ -1,11 +1,18 @@
 import { EmailAlreadyInUseError } from 'domain/user/errors/email-already-in-use-error'
 import { CreateUserUsecase } from 'app/user/usecases/create-user/create-user.usecases'
 import { UserRepository } from 'infra/account/prisma/repository/user.repository'
-import { CreateUserRequest, LoginResponse } from './dtos/account-controller.dto'
+import {
+  CreateUserRequest,
+  GetUserDataRequest,
+  GetUserDataResponse,
+  LoginResponse,
+} from './dtos/account-controller.dto'
 import { LoginInput } from '@domain/user/repository/user.repository.interface'
 import { WrongCredentialsError } from '@domain/user/errors/wrong-credentials-error'
 import { LoginUseCase } from 'app/user/usecases/login/login.usecase'
 import { container } from 'tsyringe'
+import { UserNotFoundError } from '@domain/user/errors/user-not-found-error'
+import { GetUserDataUsecase } from 'app/user/usecases/get-user-data/get-user-data'
 
 export class UserController {
   public async create(input: CreateUserRequest) {
@@ -31,15 +38,27 @@ export class UserController {
     try {
       const usecase = new LoginUseCase(new UserRepository())
       const token = await usecase.execute({ email, password })
-      console.log('controller', token)
       return token
     } catch (error) {
-      console.log('error', error)
       if (error instanceof WrongCredentialsError) {
         return { message: error.message }
       }
 
       return { message: 'Error while trying login.' }
+    }
+  }
+
+  public async getUserData(input: GetUserDataRequest): Promise<GetUserDataResponse> {
+    const { userId } = input
+    try {
+      const usecase = new GetUserDataUsecase(new UserRepository())
+      const user = await usecase.execute({ userId })
+      return user
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        return { message: error.message }
+      }
+      return { message: 'Error while trying get the user data.' }
     }
   }
 }
