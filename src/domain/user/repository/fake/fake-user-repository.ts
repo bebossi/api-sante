@@ -1,3 +1,4 @@
+import { UserId } from '@domain/user/value-objects/user-id'
 import { User } from 'domain/user/entity/user'
 import {
   IUserRepository,
@@ -16,6 +17,16 @@ class FakeUsersRepository implements IUserRepository {
   }
   async findByEmail(email: string): Promise<User | null> {
     const user = this.users.find((user) => user.email === email)
+    if (!user) return null
+    return user
+  }
+
+  async findById(userId: string | UserId): Promise<User | null> {
+    let id: UserId
+    if (!(userId instanceof UserId)) {
+      id = new UserId(userId)
+    }
+    const user = this.users.find((user) => user.id.equals(id))
     if (!user) return null
     return user
   }
