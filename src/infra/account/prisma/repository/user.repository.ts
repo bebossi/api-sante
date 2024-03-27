@@ -1,3 +1,4 @@
+import { UserId } from '@domain/user/value-objects/user-id'
 import { prisma } from '../../../../@config/prisma'
 import { User } from '../../../../domain/user/entity/user'
 import {
@@ -35,8 +36,22 @@ export class UserRepository implements IUserRepository {
         AND: [{ email }, { password }],
       },
     })
-    console.log(user)
     if (user) return true
     return false
+  }
+
+  async findById(userId: string | UserId): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId instanceof UserId ? userId.value : userId,
+      },
+      include: {
+        addresses: true,
+        orders: true,
+      },
+    })
+    if (!user) return null
+
+    return UserMapper.toEntity(user)
   }
 }
