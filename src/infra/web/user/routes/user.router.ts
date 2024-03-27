@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { publicProcedure, router } from '../../trpc'
 import { UserController } from '../controllers/user.controller'
+import { authorizedProcedure } from '@infra/web/auth.middleware'
+import { TRPCError } from '@trpc/server'
 
 const userController = new UserController()
 
@@ -26,7 +28,15 @@ export const userRouter = router({
       const tokenOrErrorMessage = await userController.login(
         input as Required<typeof input>
       )
-      console.log('route', tokenOrErrorMessage)
       return tokenOrErrorMessage
+    }),
+  getUserData: authorizedProcedure
+    .input(z.object({ userId: z.string().optional() }))
+    .query(async ({ input, ctx }) => {
+      const { user_id: loggedUserId } = ctx
+      if (!loggedUserId) throw new TRPCError({ code: 'UNAUTHORIZED' })
+      const { userId } = input
+      const result = await userController.getUserData({ userId: userId ?? loggedUserId })
+      return result
     }),
 })
