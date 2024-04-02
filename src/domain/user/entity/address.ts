@@ -3,7 +3,7 @@ import { Order } from '../../order/entity/order'
 import { UserProps } from './user'
 
 export type AddressProps = {
-  id: string
+  // id: string
   street: string
   neighborhood: string
   city: string
@@ -11,7 +11,7 @@ export type AddressProps = {
   complementNumber: number
   zip: string
   userId: UserId | string
-  user: UserProps
+  // user: UserProps
 }
 export default class Address {
   _street: string = ''
@@ -65,23 +65,19 @@ export default class Address {
   }
 
   validate() {
-    if (this._street.length === 0) {
-      throw new Error('Street is required')
+    const requiredFields = {
+      street: this._street,
+      streetNumber: this._streetNumber,
+      neighborhood: this._neighborhood,
+      city: this._city,
+      zip: this._zip,
+      userId: this._userId,
     }
-    if (this._streetNumber === 0) {
-      throw new Error('Number is required')
-    }
-    if (!this._userId) {
-      throw new Error('Number is required')
-    }
-    if (this._zip.length === 0) {
-      throw new Error('Zip is required')
-    }
-    if (this._neighborhood.length === 0) {
-      throw new Error('Neighborhood is required')
-    }
-    if (this._city.length === 0) {
-      throw new Error('City is required')
+
+    for (const [key, value] of Object.entries(requiredFields)) {
+      if (value === null || value === undefined || value === '' || value === 0) {
+        throw new Error(`${key.charAt(0).toUpperCase() + key.slice(1)} is required`)
+      }
     }
   }
 
