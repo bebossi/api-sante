@@ -6,6 +6,7 @@ import {
   LoginInput,
 } from '../../../../domain/user/repository/user.repository.interface'
 import { UserMapper } from './mappers/user-mapper'
+import Address from '@domain/user/entity/address'
 
 export class UserRepository implements IUserRepository {
   async create(user: User): Promise<void> {
@@ -53,5 +54,18 @@ export class UserRepository implements IUserRepository {
     if (!user) return null
 
     return UserMapper.toEntity(user)
+  }
+
+  async createAddress(inputAddress: Address): Promise<void> {
+    await prisma.address.create({
+      data: {
+        zip: inputAddress.zip,
+        neighborhood: inputAddress.neighborhood,
+        street: inputAddress.street,
+        street_number: inputAddress.streetNumber,
+        complement_number: inputAddress.complementNumber,
+        user_id: inputAddress.userId.toString(),
+      },
+    })
   }
 }
