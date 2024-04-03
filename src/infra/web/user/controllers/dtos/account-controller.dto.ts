@@ -1,5 +1,6 @@
 import { Order } from '@domain/order/entity/order'
-import Address from '@domain/user/entity/address'
+import Address, { AddressProps } from '@domain/user/entity/address'
+import { UserId } from '@domain/user/value-objects/user-id'
 
 export interface CreateUserRequest {
   name: string
@@ -34,3 +35,13 @@ export type GetUserDataResponse =
       updatedAt: string
     }
   | { message: string }
+
+export interface CreateUserAddressRequest {
+  userId: string | UserId
+  street: string
+  neighborhood: string
+  city: string
+  streetNumber: number
+  complementNumber?: number
+  zip: string
+}
