@@ -8,7 +8,7 @@ export type AddressProps = {
   neighborhood: string
   city: string
   streetNumber: number
-  complementNumber: number
+  complementNumber?: number
   zip: string
   userId: UserId | string
   // user: UserProps
@@ -18,7 +18,7 @@ export default class Address {
   _city: string = ''
   _neighborhood: string
   _streetNumber: number
-  _complementNumber: number
+  _complementNumber: number | undefined
   _zip: string
   _userId: string | UserId
 
@@ -26,7 +26,7 @@ export default class Address {
     this._street = props.street
     this._streetNumber = props.streetNumber
     this._neighborhood = props.neighborhood
-    this._complementNumber = props.complementNumber
+    this._complementNumber = props.complementNumber ?? undefined
     this._zip = props.zip
     this._city = props.city
     this._userId = props.userId
@@ -50,6 +50,9 @@ export default class Address {
 
   get streetNumber(): number {
     return this._streetNumber
+  }
+  get complementNumber(): number | undefined {
+    return this._complementNumber || undefined
   }
 
   get zip(): string {
