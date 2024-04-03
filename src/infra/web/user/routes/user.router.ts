@@ -39,4 +39,21 @@ export const userRouter = router({
       const result = await userController.getUserData({ userId: userId ?? loggedUserId })
       return result
     }),
+  createAddress: authorizedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        zip: z.string(),
+        street: z.string(),
+        neighborhood: z.string(),
+        city: z.string(),
+        streetNumber: z.number(),
+        complementNumber: z.number(),
+      })
+    )
+    .mutation(async (opts) => {
+      const { input } = opts
+      const result = await userController.createAddress(input as Required<typeof input>)
+      return result
+    }),
 })
