@@ -2,6 +2,7 @@ import { EmailAlreadyInUseError } from 'domain/user/errors/email-already-in-use-
 import { CreateUserUsecase } from 'app/user/usecases/create-user/create-user.usecases'
 import { UserRepository } from 'infra/account/prisma/repository/user.repository'
 import {
+  CreateUserAddressRequest,
   CreateUserRequest,
   GetUserDataRequest,
   GetUserDataResponse,
@@ -10,9 +11,9 @@ import {
 import { LoginInput } from '@domain/user/repository/user.repository.interface'
 import { WrongCredentialsError } from '@domain/user/errors/wrong-credentials-error'
 import { LoginUseCase } from 'app/user/usecases/login/login.usecase'
-import { container } from 'tsyringe'
 import { UserNotFoundError } from '@domain/user/errors/user-not-found-error'
 import { GetUserDataUsecase } from 'app/user/usecases/get-user-data/get-user-data'
+import { CreateUserAddressUsecase } from 'app/user/usecases/create-user-address/create-user-address.usecase'
 
 export class UserController {
   public async create(input: CreateUserRequest) {
@@ -59,6 +60,17 @@ export class UserController {
         return { message: error.message }
       }
       return { message: 'Error while trying get the user data.' }
+    }
+  }
+
+  public async createAddress(input: CreateUserAddressRequest) {
+    try {
+      const usecase = new CreateUserAddressUsecase(new UserRepository())
+      await usecase.execute(input)
+      return { message: 'Address created successfully' }
+    } catch (error) {
+      console.log(error)
+      return { message: 'Error while trying create user address.' }
     }
   }
 }
