@@ -2,6 +2,8 @@ import { Order } from 'domain/order/entity/order'
 import UserValidatorFactory from '../factories/validators/user-validator.factory'
 import { UserId } from '../value-objects/user-id'
 import Address from './address'
+import { AggregateRoot } from '@domain/@shared/aggegate-root'
+import NotificationError from '@domain/@shared/notification/notification-error'
 
 export type UserProps = {
   id: UserId
@@ -27,10 +29,10 @@ export type UserConstructorProps = {
   // orders: Order[]
 }
 
-class User {
+class User extends AggregateRoot {
   _props: UserProps = {} as UserProps
-  private _id: UserId
   constructor(props: UserConstructorProps) {
+    super()
     this._props.id =
       typeof props.id === 'string' ? new UserId(props.id) : props.id ?? new UserId()
 
@@ -83,6 +85,9 @@ class User {
 
   public validate() {
     UserValidatorFactory.create().validate(this)
+    if (this._notification.hasErrors()) {
+      throw new NotificationError(this._notification.getErrors())
+    }
   }
 
   toJSON() {
