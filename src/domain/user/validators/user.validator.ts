@@ -32,7 +32,12 @@ class UserValidator implements EntityValidator<User> {
         )
     } catch (errors) {
       const e = errors as yup.ValidationError
-      console.log(e)
+      e.errors.forEach((error) => {
+        entity.notification.addError({
+          context: 'user',
+          message: error,
+        })
+      })
     }
   }
 }
