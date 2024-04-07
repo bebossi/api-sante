@@ -1,7 +1,7 @@
 import { AggregateRoot } from '@domain/@shared/aggegate-root'
 import ProductValidatorFactory from '../../factories/validators/product-validator.factory'
 import { ProductId } from '../../value-objects/product-id'
-import { Category } from '../category'
+import { Category } from '../category/category'
 import { ToppingModel } from '../topping'
 import NotificationError from '@domain/@shared/notification/notification-error'
 
@@ -10,7 +10,7 @@ export type ProductProps = {
   name: string
   description: string
   price: number
-  image?: string
+  image: string
   categoryId: string
   category: Category
   toppings: ToppingModel[]
@@ -22,11 +22,11 @@ export type ProductConstructorProps = {
   name: string
   description: string
   price: number
-  image?: string
+  image: string
   categoryId: string
   toppings: ToppingModel[]
-  updatedAt: any
-  createdAt: string | number | Date
+  updatedAt?: any
+  createdAt?: string | number | Date
 }
 
 class Product extends AggregateRoot {
