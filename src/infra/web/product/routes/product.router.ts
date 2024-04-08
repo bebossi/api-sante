@@ -1,6 +1,6 @@
 import { ProductController } from '@infra/web/product/controllers/product.controller'
 import { z } from 'zod'
-import { router } from '../../trpc'
+import { publicProcedure, router } from '../../trpc'
 import { authorizedProcedure } from '@infra/web/auth.middleware'
 
 const productController = new ProductController()
@@ -31,4 +31,8 @@ export const productRouter = router({
       const result = await productController.create(input as Required<typeof input>)
       return result
     }),
+  getProducts: publicProcedure.query(async () => {
+    const products = await productController.getProducts()
+    return products
+  }),
 })
