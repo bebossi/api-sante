@@ -13,7 +13,7 @@ export type ProductProps = {
   image: string
   categoryId: string
   category: Category
-  toppings: ToppingModel[]
+  toppings: ToppingModel[] | []
   createdAt: Date
   updatedAt: Date
 }
@@ -24,7 +24,7 @@ export type ProductConstructorProps = {
   price: number
   image: string
   categoryId: string
-  toppings: ToppingModel[]
+  toppings: ToppingModel[] | []
   updatedAt?: any
   createdAt?: string | number | Date
 }
@@ -41,7 +41,7 @@ class Product extends AggregateRoot {
     this._props.price = props.price
     this._props.image = props.image
     this._props.categoryId = props.categoryId
-    this._props.toppings = props.toppings
+    this._props.toppings = props.toppings || []
     this._props.createdAt = props.createdAt ? new Date(props.createdAt) : new Date()
     this._props.updatedAt = props.updatedAt
       ? new Date(props.updatedAt)
