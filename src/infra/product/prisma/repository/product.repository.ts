@@ -3,7 +3,6 @@ import { IProductRepository } from '@domain/product/repository/product.repositor
 import { ProductId } from '@domain/product/value-objects/product-id'
 import { ProductMapper } from './mappers/product-mapper'
 import { prisma } from '@config/prisma'
-import { Category } from '@domain/product/entity/category/category'
 
 export class ProductRepository implements IProductRepository {
   async create(input: Product): Promise<void> {
@@ -37,18 +36,20 @@ export class ProductRepository implements IProductRepository {
       },
     })
   }
-  findAll(): Promise<Product[] | null> {
-    throw new Error('Method not implemented.')
+  async findAll(): Promise<Product[] | null> {
+    const products = await prisma.product.findMany({
+      include: {
+        toppings: true,
+      },
+    })
+    if (!products) return null
+
+    const productsFormatted = products.map((product) => {
+      return ProductMapper.toEntity(product)
+    })
+    return productsFormatted
   }
   findById(id: string | ProductId): Promise<Product | null> {
     throw new Error('Method not implemented.')
-  }
-
-  async createCategory(input: Category): Promise<void> {
-    await prisma.category.create({
-      data: {
-        name: input.name,
-      },
-    })
   }
 }
