@@ -1,4 +1,4 @@
-import { ProductPayload as PrismaProduct, ToppingPayload } from '@prisma/client'
+import { ProductPayload, Product as PrismaProduct, ToppingPayload } from '@prisma/client'
 import { Product } from '@domain/product/entity/product/product'
 
 class ProductMapper {
@@ -18,27 +18,37 @@ class ProductMapper {
     return map
   }
 
-  public static toEntity(input: PrismaProduct, toppings: ToppingPayload): Product {
+  public static toEntity(
+    input: PrismaProduct & { toppings: any },
+    toppings?: ToppingPayload
+  ): Product {
     const product = Product.create({
-      id: input.scalars.id,
-      name: input.scalars.name,
-      description: input.scalars.description,
-      categoryId: input.scalars.category_id,
-      image: input.scalars.image,
-      toppings: input.objects.toppings.map((topping) => {
-        return {
-          id: topping.scalars.id,
-          name: topping.scalars.name,
-          description: topping.scalars.description,
-          price: topping.scalars.price,
-          productId: topping.scalars.product_id,
-          image: topping.scalars.image,
-        }
-      }),
-
-      createdAt: input.scalars.created_at,
-      updatedAt: input.scalars.updated_at,
+      id: input.id,
+      name: input.name as string,
+      description: input.description as string,
+      categoryId: input.category_id as string,
+      image: input.image as string,
+      createdAt: input.created_at,
+      updatedAt: input.updated_at,
       price: 0,
+      toppings:
+        input.toppings?.map(
+          (topping: {
+            id: any
+            name: any
+            description: any
+            price: any
+            product_id: any
+            image: any
+          }) => ({
+            id: topping.id,
+            name: topping.name,
+            description: topping.description,
+            price: topping.price,
+            productId: topping.product_id,
+            image: topping.image,
+          })
+        ) || [],
     })
 
     return product
