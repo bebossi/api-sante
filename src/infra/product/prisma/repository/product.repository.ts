@@ -16,11 +16,10 @@ export class ProductRepository implements IProductRepository {
         price: productFormatted.price,
         image: productFormatted.image,
         created_at: productFormatted.created_at,
-        category_id: productFormatted.categoryId,
+        category_id: productFormatted.categoryId.value,
         toppings: {
           connectOrCreate: productFormatted.toppings.map((topping) => ({
             where: {
-              // you need to provide a unique identifier condition here, for example:
               id: topping.id,
             },
             create: {
@@ -49,7 +48,17 @@ export class ProductRepository implements IProductRepository {
     })
     return productsFormatted
   }
-  findById(id: string | ProductId): Promise<Product | null> {
-    throw new Error('Method not implemented.')
+  async findById(productId: string | ProductId): Promise<Product | null> {
+    const product = await prisma.product.findUnique({
+      where: {
+        id: productId instanceof ProductId ? productId.value : productId,
+      },
+      include: {
+        toppings: true,
+      },
+    })
+    if (!product) return null
+
+    return ProductMapper.toEntity(product)
   }
 }
