@@ -8,3 +8,7 @@ export interface CreateProductRequest {
   categoryId: string
   toppings: ToppingModel[]
 }
+
+export interface GetProductDataRequest {
+  productId: string
+}
