@@ -11,11 +11,21 @@ class FakeProductRepository implements IProductRepository {
   async create(input: Product): Promise<void> {
     this.products.push(input)
   }
-  findAll(): Promise<Product[] | null> {
-    throw new Error('Method not implemented.')
+  async findAll(): Promise<Product[] | null> {
+    if (this.products.length <= 0) return null
+    return this.products
   }
-  findById(id: string | ProductId): Promise<Product | null> {
-    throw new Error('Method not implemented.')
+  async findById(userId: string | ProductId): Promise<Product | null> {
+    let id: ProductId
+    if (!(userId instanceof ProductId)) {
+      id = new ProductId(userId)
+    }
+    const product = this.products.find((product) => {
+      return product.id.equals(id)
+    })
+
+    if (!product) return null
+    return product
   }
 }
 
