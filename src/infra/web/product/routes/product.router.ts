@@ -2,6 +2,7 @@ import { ProductController } from '@infra/web/product/controllers/product.contro
 import { z } from 'zod'
 import { publicProcedure, router } from '../../trpc'
 import { authorizedProcedure } from '@infra/web/auth.middleware'
+import { TRPCError } from '@trpc/server'
 
 const productController = new ProductController()
 
@@ -35,4 +36,12 @@ export const productRouter = router({
     const products = await productController.getProducts()
     return products
   }),
+  getProduct: publicProcedure
+    .input(z.object({ productId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { productId } = input
+      if (!productId) throw new TRPCError({ code: 'BAD_REQUEST' })
+      const result = await productController.getProduct({ productId })
+      return result
+    }),
 })
