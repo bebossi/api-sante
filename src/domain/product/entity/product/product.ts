@@ -4,6 +4,7 @@ import { ProductId } from '../../value-objects/product-id'
 import { Category } from '../category/category'
 import { ToppingModel } from '../topping'
 import NotificationError from '@domain/@shared/notification/notification-error'
+import { CategoryId } from '@domain/product/value-objects/category-id'
 
 export type ProductProps = {
   id: ProductId
@@ -11,7 +12,7 @@ export type ProductProps = {
   description: string
   price: number
   image: string
-  categoryId: string
+  categoryId: CategoryId
   category: Category
   toppings: ToppingModel[] | []
   createdAt: Date
@@ -23,7 +24,7 @@ export type ProductConstructorProps = {
   description: string
   price: number
   image: string
-  categoryId: string
+  categoryId: CategoryId | string
   toppings: ToppingModel[] | []
   updatedAt?: any
   createdAt?: string | number | Date
@@ -40,7 +41,10 @@ class Product extends AggregateRoot {
     this._props.description = props.description
     this._props.price = props.price
     this._props.image = props.image
-    this._props.categoryId = props.categoryId
+    this._props.categoryId =
+      typeof props.categoryId === 'string'
+        ? new CategoryId(props.categoryId)
+        : props.categoryId ?? new CategoryId()
     this._props.toppings = props.toppings || []
     this._props.createdAt = props.createdAt ? new Date(props.createdAt) : new Date()
     this._props.updatedAt = props.updatedAt
