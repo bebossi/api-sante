@@ -1,6 +1,8 @@
 import ProductValidatorFactory from '@domain/product/factories/validators/product-validator.factory'
 import { Product, ProductConstructorProps } from './product'
 import { ProductId } from '@domain/product/value-objects/product-id'
+import { Category } from '../category/category'
+import { CategoryId } from '@domain/product/value-objects/category-id'
 
 describe('Product entity', () => {
   const productProps = {
@@ -9,7 +11,7 @@ describe('Product entity', () => {
     description: 'A delicious tomato and cheese pizza',
     price: 9.99,
     image: 'image-url',
-    categoryId: 'rehntrjntyjtyj',
+    categoryId: new CategoryId(),
     // toppings: [new ToppingModel({ id: '1', name: 'Cheese' })],
     toppings: [],
     createdAt: new Date(),
@@ -61,7 +63,7 @@ describe('Product entity', () => {
       description: 'A delicious tomato and cheese pizza',
       price: 9.99,
       image: 'image-url',
-      categoryId: 'iuhnjewkfbn ewcewknv',
+      categoryId: new CategoryId(),
       toppings: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -78,7 +80,7 @@ describe('Product entity', () => {
       description: 'A delicious tomato and cheese pizza',
       // price: 9.99,
       image: 'image-url',
-      categoryId: 'iuhnjewkfbn ewcewknv',
+      categoryId: new CategoryId(),
       toppings: [],
       createdAt: new Date(),
       updatedAt: new Date(),
