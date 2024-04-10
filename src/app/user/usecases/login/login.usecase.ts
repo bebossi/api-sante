@@ -39,7 +39,10 @@ class LoginUseCase {
     })
 
     const token = jwt.sign(
-      {},
+      {
+        id: user.id.value,
+        role: user.role,
+      },
       process.env.TOKEN_SIGN_SECRET || ('iewjfbhewkjfbewjhb' as string),
       {
         expiresIn: '24h',
