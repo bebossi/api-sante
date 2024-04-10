@@ -2,7 +2,7 @@ import { AggregateRoot } from '@domain/@shared/aggegate-root'
 import ProductValidatorFactory from '../../factories/validators/product-validator.factory'
 import { ProductId } from '../../value-objects/product-id'
 import { Category } from '../category/category'
-import { ToppingModel } from '../topping'
+import { Topping, ToppingConstructorProps } from '../topping/topping'
 import NotificationError from '@domain/@shared/notification/notification-error'
 import { CategoryId } from '@domain/product/value-objects/category-id'
 
@@ -14,7 +14,7 @@ export type ProductProps = {
   image: string
   categoryId: CategoryId
   category: Category
-  toppings: ToppingModel[] | []
+  toppings: ToppingConstructorProps[] | []
   createdAt: Date
   updatedAt: Date
 }
@@ -25,7 +25,7 @@ export type ProductConstructorProps = {
   price: number
   image: string
   categoryId: CategoryId | string
-  toppings: ToppingModel[] | []
+  toppings: ToppingConstructorProps[] | []
   updatedAt?: any
   createdAt?: string | number | Date
 }
