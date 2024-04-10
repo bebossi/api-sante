@@ -47,7 +47,6 @@ export const createContext = ({ req, res }: trpcExpress.CreateExpressContextOpti
 }
 
 export const t = initTRPC.context<Awaited<ReturnType<typeof createContext>>>().create()
-// export const t = initTRPC.create()
 export const router = t.router
 export const middleware = t.middleware
 export const publicProcedure = t.procedure
