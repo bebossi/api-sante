@@ -20,14 +20,14 @@ export class ProductRepository implements IProductRepository {
         toppings: {
           connectOrCreate: productFormatted.toppings.map((topping) => ({
             where: {
-              id: topping.id,
+              id: topping.id as string,
             },
             create: {
-              id: topping.id,
+              id: topping.id as string,
               name: topping.name,
               description: topping.description,
               price: topping.price,
-              productId: topping.productId,
+              productId: topping.productId as string,
               image: topping.image,
             },
           })),
