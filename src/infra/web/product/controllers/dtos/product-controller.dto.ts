@@ -1,4 +1,4 @@
-import { ToppingModel } from '@domain/product/entity/topping'
+import { Topping, ToppingConstructorProps } from '@domain/product/entity/topping/topping'
 
 export interface CreateProductRequest {
   name: string
@@ -6,7 +6,7 @@ export interface CreateProductRequest {
   price: number
   image: string
   categoryId: string
-  toppings: ToppingModel[]
+  toppings: ToppingConstructorProps[]
 }
 
 export interface GetProductDataRequest {
