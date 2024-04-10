@@ -1,5 +1,5 @@
 import { Product } from '@domain/product/entity/product/product'
-import { ToppingModel } from '@domain/product/entity/topping'
+import { Topping, ToppingConstructorProps } from '@domain/product/entity/topping/topping'
 import { CategoryNotFoundError } from '@domain/product/errors/category-not-found-error'
 import { ICategoryRepository } from '@domain/product/repository/category.repository.interface'
 import { IProductRepository } from '@domain/product/repository/product.repository.interface'
@@ -11,14 +11,14 @@ export interface CreateProductUsecaseInput {
   price: number
   image: string
   categoryId: string
-  toppings: ToppingModel[]
+  toppings: ToppingConstructorProps[]
 }
 
 export interface ICreateProductUsecases {
-  execute(input: CreateProductUsecaseInput): Promise<CategoryUseCaseOutput>
+  execute(input: CreateProductUsecaseInput): Promise<ProductUseCaseOutput>
 }
 
-interface CategoryUseCaseOutput {
+interface ProductUseCaseOutput {
   message: string
 }
 
@@ -29,7 +29,7 @@ export class CreateProductUsecase implements ICreateProductUsecases {
     private productRepository: IProductRepository,
     private categoryRepository: ICategoryRepository
   ) {}
-  async execute(input: CreateProductUsecaseInput): Promise<CategoryUseCaseOutput> {
+  async execute(input: CreateProductUsecaseInput): Promise<ProductUseCaseOutput> {
     const { name, description, price, image, categoryId, toppings } = input
 
     const category = await this.categoryRepository.findById(categoryId)
