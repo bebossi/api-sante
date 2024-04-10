@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { router } from '../../trpc'
-import { authorizedProcedure } from '@infra/web/auth.middleware'
+import { adminProcedure } from '@infra/web/auth.middleware'
 import { CategoryController } from '../controllers/category.controller'
 
 const categoryController = new CategoryController()
 
 export const categoryRouter = router({
-  create: authorizedProcedure
+  create: adminProcedure
     .input(
       z.object({
         name: z.string(),

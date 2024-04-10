@@ -1,13 +1,13 @@
 import { ProductController } from '@infra/web/product/controllers/product.controller'
 import { z } from 'zod'
 import { publicProcedure, router } from '../../trpc'
-import { authorizedProcedure } from '@infra/web/auth.middleware'
+import { adminProcedure, authorizedProcedure } from '@infra/web/auth.middleware'
 import { TRPCError } from '@trpc/server'
 
 const productController = new ProductController()
 
 export const productRouter = router({
-  create: authorizedProcedure
+  create: adminProcedure
     .input(
       z.object({
         name: z.string(),
