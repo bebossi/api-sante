@@ -1,76 +1,77 @@
-import { EmailAlreadyInUseError } from 'domain/user/errors/email-already-in-use-error'
-import { CreateUserUsecase } from 'app/user/usecases/create-user/create-user.usecases'
-import { UserRepository } from 'infra/account/prisma/repository/user.repository'
+import { EmailAlreadyInUseError } from "domain/user/errors/email-already-in-use-error";
+import { CreateUserUsecase } from "app/user/usecases/create-user/create-user.usecases";
+import { UserRepository } from "infra/account/prisma/repository/user.repository";
 import {
   CreateUserAddressRequest,
   CreateUserRequest,
   GetUserDataRequest,
   GetUserDataResponse,
   LoginResponse,
-} from './dtos/account-controller.dto'
-import { LoginInput } from '@domain/user/repository/user.repository.interface'
-import { WrongCredentialsError } from '@domain/user/errors/wrong-credentials-error'
-import { LoginUseCase } from 'app/user/usecases/login/login.usecase'
-import { UserNotFoundError } from '@domain/user/errors/user-not-found-error'
-import { GetUserDataUsecase } from 'app/user/usecases/get-user-data/get-user-data'
-import { CreateUserAddressUsecase } from 'app/user/usecases/create-user-address/create-user-address.usecase'
+} from "./dtos/account-controller.dto";
+import { LoginInput } from "@domain/user/repository/user.repository.interface";
+import { WrongCredentialsError } from "@domain/user/errors/wrong-credentials-error";
+import { LoginUseCase } from "app/user/usecases/login/login.usecase";
+import { UserNotFoundError } from "@domain/user/errors/user-not-found-error";
+import { GetUserDataUsecase } from "app/user/usecases/get-user-data/get-user-data";
+import { CreateUserAddressUsecase } from "app/user/usecases/create-user-address/create-user-address.usecase";
 
 export class UserController {
   public async create(input: CreateUserRequest) {
-    const { email, password, name, role } = input
+    const { email, password, name, role } = input;
     try {
-      const createUserUsecase = new CreateUserUsecase(new UserRepository())
-      // const createUserUsecase = container.resolve(CreateUserUsecase)
-      await createUserUsecase.execute({ name, email, password, role })
+      const createUserUsecase = new CreateUserUsecase(new UserRepository());
+      await createUserUsecase.execute({ name, email, password, role });
 
-      return { message: 'User created successfully' }
+      return { message: "User created successfully" };
     } catch (err) {
-      console.log(err)
+      console.log(err);
       if (err instanceof EmailAlreadyInUseError) {
-        return { message: err.message }
+        return { message: err.message };
       }
 
-      return { message: 'Error while trying register a new user.' }
+      return { message: "Error while trying register a new user." };
     }
   }
 
   public async login(input: LoginInput): Promise<LoginResponse> {
-    const { email, password } = input
+    const { email, password } = input;
     try {
-      const usecase = new LoginUseCase(new UserRepository())
-      const token = await usecase.execute({ email, password })
-      return token
+      const usecase = new LoginUseCase(new UserRepository());
+      const token = await usecase.execute({ email, password });
+      return token;
     } catch (error) {
       if (error instanceof WrongCredentialsError) {
-        return { message: error.message }
+        return { message: error.message };
       }
 
-      return { message: 'Error while trying login.' }
+      return { message: "Error while trying login." };
     }
   }
 
-  public async getUserData(input: GetUserDataRequest): Promise<GetUserDataResponse> {
-    const { userId } = input
+  public async getUserData(
+    input: GetUserDataRequest
+  ): Promise<GetUserDataResponse> {
+    const { userId } = input;
     try {
-      const usecase = new GetUserDataUsecase(new UserRepository())
-      const user = await usecase.execute({ userId })
-      return user
+      const usecase = new GetUserDataUsecase(new UserRepository());
+      const user = await usecase.execute({ userId });
+      return user;
     } catch (error) {
       if (error instanceof UserNotFoundError) {
-        return { message: error.message }
+        return { message: error.message };
       }
-      return { message: 'Error while trying get the user data.' }
+      return { message: "Error while trying get the user data." };
     }
   }
 
   public async createAddress(input: CreateUserAddressRequest) {
     try {
-      const usecase = new CreateUserAddressUsecase(new UserRepository())
-      await usecase.execute(input)
-      return { message: 'Address created successfully' }
+      const usecase = new CreateUserAddressUsecase(new UserRepository());
+      await usecase.execute(input);
+      return { message: "Address created successfully" };
     } catch (error) {
-      console.log(error)
-      return { message: 'Error while trying create user address.' }
+      console.log(error);
+      return { message: "Error while trying create user address." };
     }
   }
 }
