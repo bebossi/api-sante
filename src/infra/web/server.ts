@@ -1,34 +1,34 @@
-import 'reflect-metadata'
-import dotenv from 'dotenv'
-import express from 'express'
-import '../../infra/container'
-import * as trpcExpress from '@trpc/server/adapters/express'
-import cors from 'cors'
-import { appRouter } from './routes'
-import { createContext } from './trpc'
+import "reflect-metadata";
+import dotenv from "dotenv";
+import express from "express";
+import "../../infra/container";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import cors from "cors";
+import { appRouter } from "./routes";
+import { createContext } from "./trpc";
 
 const runApp = async () => {
-  dotenv.config()
+  dotenv.config();
 
-  const app = express()
+  const app = express();
 
-  app.use(cors())
-  app.disable('x-powered-by')
-  app.use(express.json())
+  app.use(cors());
+  app.disable("x-powered-by");
+  app.use(express.json());
   app.use(
-    '/trpc',
+    "/trpc",
     trpcExpress.createExpressMiddleware({
       router: appRouter,
       createContext,
-      onError: (trpc) => console.error(trpc.error),
+      onError: (trpc) => console.error("Error", trpc.error),
     })
-  )
+  );
 
-  const port: number = Number(process.env.PORT) || 3000
+  const port: number = Number(process.env.PORT) || 3000;
 
   app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`)
-  })
-}
+    console.log(`Server is listening on port ${port}`);
+  });
+};
 
-runApp()
+runApp();
